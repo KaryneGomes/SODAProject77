@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro | SODA</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="screen cadastro">
+        <a class="top-link" href="/inicio">← Voltar</a>
+
+        <div class="welcome">
+          <h2>Crie sua conta</h2>
+          <p>Preencha os dados para acessar o SODA</p>
+        </div>
+
+        <form id="cadastroForm">
+          <div class="form-group">
+            <label for="tipoUsuario">Perfil de acesso</label>
+            <select id="tipoUsuario" class="select" name="tipoUsuario">
+              <option value="aluno">Aluno</option>
+              <option value="professor">Professor</option>
+              <option value="servidor">Servidor</option>
+              <option value="coordenador">Coordenador</option>
+            </select>
+          </div>
+
+          <div id="camposExtras"></div>
+
+          <div class="form-group">
+            <label for="nome">Nome completo</label>
+            <input id="nome" class="input" type="text" name="nome" placeholder="Digite seu nome completo" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-mail institucional</label>
+            <input id="email" class="input" type="email" name="email" placeholder="seu@email.edu.br" required />
+          </div>
+
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input id="senha" class="input" type="password" name="senha" placeholder="Crie uma senha" required />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmarSenha">Confirmar senha</label>
+            <input id="confirmarSenha" class="input" type="password" name="confirmarSenha" placeholder="Repita a senha" required />
+          </div>
+
+          <div id="statusMessage" class="status-message" aria-live="polite"></div>
+
+          <button class="primary-btn" type="submit">Cadastrar</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const camposExtras = document.getElementById('camposExtras');
+      const tipoUsuario = document.getElementById('tipoUsuario');
+
+      const camposPorPerfil = {
+        aluno: [
+          { name: 'matricula', label: 'Matrícula acadêmica', type: 'text', placeholder: 'Digite sua matrícula' },
+          { name: 'curso', label: 'Curso', type: 'text', placeholder: 'Digite o curso' },
+          { name: 'periodo', label: 'Período / semestre', type: 'text', placeholder: 'Ex.: 3º período' }
+        ],
+        professor: [
+          { name: 'matricula', label: 'Matrícula', type: 'text', placeholder: 'Digite sua matrícula' },
+          { name: 'disciplina', label: 'Disciplina', type: 'text', placeholder: 'Digite a disciplina' },
+          { name: 'cargo', label: 'Cargo', type: 'text', placeholder: 'Ex.: Professor titular' }
+        ],
+        servidor: [
+          { name: 'matricula', label: 'Matrícula', type: 'text', placeholder: 'Digite sua matrícula' },
+          { name: 'cargo', label: 'Cargo', type: 'text', placeholder: 'Ex.: Analista administrativo' }
+        ],
+        coordenador: [
+          { name: 'matricula', label: 'Matrícula', type: 'text', placeholder: 'Digite sua matrícula' },
+          { name: 'cargo', label: 'Cargo', type: 'text', placeholder: 'Ex.: Coordenador de curso' },
+          { name: 'curso', label: 'Curso coordenado', type: 'text', placeholder: 'Digite o curso' }
+        ]
+      };
+
+      function renderCampos(tipo) {
+        const campos = camposPorPerfil[tipo] || [];
+        camposExtras.innerHTML = campos.map((campo) => `
+          <div class="form-group">
+            <label for="${campo.name}">${campo.label}</label>
+            <input id="${campo.name}" class="input" type="${campo.type}" name="${campo.name}" placeholder="${campo.placeholder}" />
+          </div>
+        `).join('');
+      }
+
+      tipoUsuario.addEventListener('change', (event) => {
+        renderCampos(event.target.value);
+      });
+
+      renderCampos(tipoUsuario.value);
+
+      document.getElementById('cadastroForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const form = event.target;
+        const data = Object.fromEntries(new FormData(form).entries());
+        const status = document.getElementById('statusMessage');
+
+        if (data.senha !== data.confirmarSenha) {
+          status.textContent = 'As senhas não coincidem.';
+          status.classList.add('error');
+          return;
+        }
+
+        status.textContent = 'Cadastrando...';
+        status.classList.remove('error');
+
+        const payload = {
+          nome: data.nome,
+          email: data.email,
+          senha: data.senha,
+          tipoUsuario: data.tipoUsuario,
+          matricula: data.matricula || null,
+          curso: data.curso || null,
+          periodo: data.periodo || null,
+          disciplina: data.disciplina || null,
+          siape: null,
+          cargo: data.cargo || null
+        };
+
+        try {
+          const response = await fetch('/usuarios/cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.erro || 'Não foi possível concluir o cadastro');
+          }
+
+          status.textContent = result.mensagem || 'Cadastro realizado com sucesso!';
+          status.classList.remove('error');
+          form.reset();
+          renderCampos(tipoUsuario.value);
+          setTimeout(() => window.location.href = '/login', 700);
+        } catch (error) {
+          status.textContent = error.message;
+          status.classList.add('error');
+        }
+      });
+    </script>
+  </body>
+</html>

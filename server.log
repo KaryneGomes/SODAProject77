@@ -1,0 +1,245 @@
+◇ injected env (7) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+Executing (default): SELECT name FROM sqlite_master WHERE type='table' AND name='usuarios';
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA TABLE_INFO(`usuarios`);
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): PRAGMA foreign_key_list(`usuarios`)
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios_backup` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios_backup` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios`;
+Executing (default): DROP TABLE `usuarios`;
+Executing (default): CREATE TABLE IF NOT EXISTS `usuarios` (`idUsuario` INTEGER PRIMARY KEY, `nome` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL UNIQUE, `senha` VARCHAR(255) NOT NULL, `tipoUsuario` TEXT NOT NULL DEFAULT 'aluno', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `matricula` VARCHAR(255), `curso` VARCHAR(255), `periodo` VARCHAR(255), `disciplina` VARCHAR(255), `siape` VARCHAR(255), `cargo` VARCHAR(255));
+Executing (default): INSERT INTO `usuarios` SELECT `idUsuario`, `nome`, `email`, `senha`, `tipoUsuario`, `createdAt`, `updatedAt`, `matricula`, `curso`, `periodo`, `disciplina`, `siape`, `cargo` FROM `usuarios_backup`;
+Executing (default): DROP TABLE `usuarios_backup`;
+Executing (default): PRAGMA INDEX_LIST(`usuarios`)
+Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_usuarios_1`)
+Executing (default): SELECT name FROM sqlite_master WHERE type='table' AND name='manifestacoes';
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes_backup` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes_backup` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes`;
+Executing (default): DROP TABLE `manifestacoes`;
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes_backup`;
+Executing (default): DROP TABLE `manifestacoes_backup`;
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes_backup` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes_backup` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes`;
+Executing (default): DROP TABLE `manifestacoes`;
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes_backup`;
+Executing (default): DROP TABLE `manifestacoes_backup`;
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes_backup` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes_backup` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes`;
+Executing (default): DROP TABLE `manifestacoes`;
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes_backup`;
+Executing (default): DROP TABLE `manifestacoes_backup`;
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes_backup` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes_backup` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes`;
+Executing (default): DROP TABLE `manifestacoes`;
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes_backup`;
+Executing (default): DROP TABLE `manifestacoes_backup`;
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes_backup` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes_backup` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes`;
+Executing (default): DROP TABLE `manifestacoes`;
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `manifestacoes` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes_backup`;
+Executing (default): DROP TABLE `manifestacoes_backup`;
+Executing (default): PRAGMA TABLE_INFO(`manifestacoes`);
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): PRAGMA foreign_key_list(`manifestacoes`)
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes_backup` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`) ON DELETE CASCADE ON UPDATE CASCADE);
+Executing (default): INSERT INTO `manifestacoes_backup` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes`;
+Executing (default): DROP TABLE `manifestacoes`;
+Executing (default): CREATE TABLE IF NOT EXISTS `manifestacoes` (`idManifestacao` INTEGER PRIMARY KEY, `titulo` VARCHAR(255) NOT NULL, `descricao` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'aberta', `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`) ON DELETE CASCADE ON UPDATE CASCADE);
+Executing (default): INSERT INTO `manifestacoes` SELECT `idManifestacao`, `titulo`, `descricao`, `status`, `createdAt`, `updatedAt`, `idUsuario` FROM `manifestacoes_backup`;
+Executing (default): DROP TABLE `manifestacoes_backup`;
+Executing (default): PRAGMA INDEX_LIST(`manifestacoes`)
+Executing (default): SELECT name FROM sqlite_master WHERE type='table' AND name='respostas';
+Executing (default): PRAGMA TABLE_INFO(`respostas`);
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): PRAGMA TABLE_INFO(`respostas`);
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas_backup` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas_backup` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas`;
+Executing (default): DROP TABLE `respostas`;
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas_backup`;
+Executing (default): DROP TABLE `respostas_backup`;
+Executing (default): PRAGMA TABLE_INFO(`respostas`);
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas_backup` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas_backup` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas`;
+Executing (default): DROP TABLE `respostas`;
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas_backup`;
+Executing (default): DROP TABLE `respostas_backup`;
+Executing (default): PRAGMA TABLE_INFO(`respostas`);
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas_backup` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas_backup` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas`;
+Executing (default): DROP TABLE `respostas`;
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas_backup`;
+Executing (default): DROP TABLE `respostas_backup`;
+Executing (default): PRAGMA TABLE_INFO(`respostas`);
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas_backup` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`) ON DELETE CASCADE ON UPDATE CASCADE, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas_backup` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas`;
+Executing (default): DROP TABLE `respostas`;
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`) ON DELETE CASCADE ON UPDATE CASCADE, `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`));
+Executing (default): INSERT INTO `respostas` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas_backup`;
+Executing (default): DROP TABLE `respostas_backup`;
+Executing (default): PRAGMA TABLE_INFO(`respostas`);
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Executing (default): PRAGMA foreign_key_list(`respostas`)
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas_backup` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`) ON DELETE SET NULL ON UPDATE CASCADE);
+Executing (default): INSERT INTO `respostas_backup` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas`;
+Executing (default): DROP TABLE `respostas`;
+Executing (default): CREATE TABLE IF NOT EXISTS `respostas` (`idResposta` INTEGER PRIMARY KEY, `texto` TEXT NOT NULL, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, `idManifestacao` INTEGER REFERENCES `manifestacoes` (`idManifestacao`), `idUsuario` INTEGER REFERENCES `usuarios` (`idUsuario`) ON DELETE SET NULL ON UPDATE CASCADE);
+Executing (default): INSERT INTO `respostas` SELECT `idResposta`, `texto`, `createdAt`, `updatedAt`, `idManifestacao`, `idUsuario` FROM `respostas_backup`;
+Executing (default): DROP TABLE `respostas_backup`;
+Executing (default): PRAGMA INDEX_LIST(`respostas`)
+Banco sincronizado
+Servidor rodando na porta 3000

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | SODA</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="screen login">
+        <a class="top-link" href="/inicio">← Voltar</a>
+
+        <div class="welcome">
+          <h2>Bem-vindo de volta</h2>
+          <p>Acesse sua conta no SODA</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input id="email" class="input" type="email" name="email" placeholder="seu@email.edu.br" required />
+          </div>
+
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input id="senha" class="input" type="password" name="senha" placeholder="••••••••" required />
+          </div>
+
+          <div id="statusMessage" class="status-message" aria-live="polite"></div>
+
+          <button class="primary-btn" type="submit">Entrar</button>
+        </form>
+
+        <p class="signup-text">
+          Ainda não tem conta?
+          <a href="/cadastro">Cadastre-se</a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('loginForm');
+      const status = document.getElementById('statusMessage');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const senha = document.getElementById('senha').value.trim();
+
+        if (!email || !senha) {
+          status.textContent = 'Informe e-mail e senha.';
+          status.classList.add('error');
+          return;
+        }
+
+        status.textContent = 'Entrando...';
+        status.classList.remove('error');
+
+        try {
+          const response = await fetch('/usuarios/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, senha })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.erro || 'Erro ao fazer login');
+          }
+
+          localStorage.setItem('sodaToken', data.token);
+          localStorage.setItem('sodaUser', JSON.stringify(data.usuario));
+          window.location.href = '/dashboard';
+        } catch (error) {
+          status.textContent = error.message;
+          status.classList.add('error');
+        }
+      });
+    </script>
+  </body>
+</html>
