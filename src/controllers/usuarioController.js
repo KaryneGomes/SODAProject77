@@ -39,8 +39,7 @@ exports.cadastrar = async (req, res) => {
       'aluno',
       'professor',
       'servidor',
-      'coordenador',
-      'admin'
+      'coordenador'
     ];
 
     if (!tiposPermitidos.includes(tipoUsuario)) {

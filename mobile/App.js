@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,7 +13,10 @@ import {
 } from 'react-native';
 import Perfil from './src/Perfil';
 
-const API_BASE_URL = 'https://arlington-murray-varying-hoped.trycloudflare.com';
+const API_BASE_URL = (
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  (Platform.OS === 'web' ? 'http://localhost:3000' : '')
+).replace(/\/+$/, '');
 const profiles = ['aluno', 'professor', 'servidor', 'coordenador'];
 
 const profileLabel = (profile) => profile[0].toUpperCase() + profile.slice(1);
@@ -46,6 +50,10 @@ export default function App() {
   }, [screen, token]);
 
   async function request(path, options = {}) {
+    if (!API_BASE_URL) {
+      throw new Error('API não configurada. Defina EXPO_PUBLIC_API_BASE_URL em mobile/.env com a URL pública do backend e reinicie o Expo.');
+    }
+
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
       headers: {

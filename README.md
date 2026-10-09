@@ -4,7 +4,7 @@ Backend Node.js para o aplicativo de manifestações. Este projeto inclui autent
 
 ## Instalação
 
-1. Copie o arquivo `.env` com as configurações padrão.
+1. Copie `.env.example` para `.env` para executar o backend localmente.
 2. Instale as dependências:
 
 ```bash
@@ -47,6 +47,23 @@ Acesse a documentação no:
 ## Banco de dados
 
 O projeto usa SQLite por padrão com arquivo `soda.sqlite`.
+
+## Usar o app em vários celulares
+
+Para os celulares acessarem a mesma API sem depender do IP de um computador:
+
+1. Crie um banco PostgreSQL no Neon e copie a connection string. O plano gratuito do PostgreSQL do Render expira após 30 dias; por isso o banco fica no Neon.
+2. Publique este repositório no GitHub e crie um Blueprint no Render usando o arquivo `render.yaml`. Informe a connection string do Neon quando o Render solicitar `DATABASE_URL`. O Blueprint gera `JWT_SECRET` automaticamente.
+3. Após o deploy, copie a URL HTTPS do serviço do Render.
+4. Copie `mobile/.env.example` para `mobile/.env` e substitua o valor por essa URL:
+
+   ```env
+   EXPO_PUBLIC_API_BASE_URL=https://sua-api.onrender.com
+   ```
+
+5. Inicie o app em `mobile` com `npx expo start --tunnel` e abra o QR Code no Expo Go. O computador que executa o Expo precisa permanecer ligado enquanto os celulares usarem esse servidor de desenvolvimento. A API, por outro lado, fica hospedada e compartilhada pela internet.
+
+O Render gratuito pode suspender a API quando fica sem uso, e o Neon pausa o banco após inatividade; a primeira requisição depois de uma pausa pode demorar. Mantenha `DATABASE_URL` e `JWT_SECRET` somente nas variáveis privadas do Render, nunca no app ou no repositório.
 
 ## Entregas do backend
 
