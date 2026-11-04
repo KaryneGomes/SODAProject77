@@ -22,6 +22,10 @@ const API_BASE_URL = (
 const profiles = ['aluno', 'professor', 'servidor', 'coordenador'];
 
 const profileLabel = (profile) => profile[0].toUpperCase() + profile.slice(1);
+const getManifestacaoRespostas = (manifestacao) => {
+  const respostas = manifestacao.Resposta || manifestacao.Respostas || manifestacao.respostas || [];
+  return Array.isArray(respostas) ? respostas : (respostas ? [respostas] : []);
+};
 
 export default function App() {
   const [screen, setScreen] = useState('home');
@@ -388,7 +392,7 @@ export default function App() {
             {item.imagem && <Image source={{ uri: item.imagem }} style={styles.manifestationImage} resizeMode="cover" />}
             <Text style={styles.manifestacaoStatus}>{item.status || 'Pendente'}</Text>
 
-            {(item.Respostas || item.respostas || []).map((resposta) => (
+            {getManifestacaoRespostas(item).map((resposta) => (
               <View style={styles.respostaCard} key={resposta.idResposta}>
                 <Text style={styles.respostaAutor}>
                   {resposta.Usuario?.nome || 'Equipe SODA'}
