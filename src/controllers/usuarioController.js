@@ -240,6 +240,7 @@ exports.listar = async (req, res) => {
         'nome',
         'email',
         'tipoUsuario',
+        'fotoPerfil',
         'matricula',
         'curso',
         'periodo',
@@ -308,6 +309,7 @@ exports.buscar = async (req, res) => {
         'nome',
         'email',
         'tipoUsuario',
+        'fotoPerfil',
         'matricula',
         'curso',
         'periodo',
@@ -367,7 +369,8 @@ exports.editar = async (req, res) => {
       periodo,
       disciplina,
       siape,
-      cargo
+      cargo,
+      fotoPerfil
     } = req.body;
 
 
@@ -427,6 +430,19 @@ exports.editar = async (req, res) => {
 
 
     const atualizacoes = {};
+
+    if (fotoPerfil !== undefined) {
+      if (fotoPerfil !== null) {
+        const fotoValida = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(fotoPerfil);
+        if (!fotoValida) {
+          return res.status(400).json({ erro: 'A foto precisa estar em JPEG, PNG ou WebP.' });
+        }
+        if (fotoPerfil.length > 7 * 1024 * 1024) {
+          return res.status(413).json({ erro: 'A foto deve ter até aproximadamente 5 MB.' });
+        }
+      }
+      atualizacoes.fotoPerfil = fotoPerfil;
+    }
 
 
     if (nome) {
