@@ -3,7 +3,7 @@ const respostaController = require('../controllers/respostaController');
 const auth = require('../midlleware/auth');
 const permit = require('../midlleware/autorizacao');
 
-router.post('/', auth, permit('admin'), respostaController.criarResposta);
+router.post('/', auth, permit('admin', 'professor', 'servidor', 'coordenador'), respostaController.criarResposta);
 router.get('/', auth, respostaController.listar);
 router.get('/:id', auth, respostaController.buscar);
 router.put('/:id', auth, respostaController.editar);

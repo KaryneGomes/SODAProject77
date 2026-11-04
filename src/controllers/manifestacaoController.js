@@ -35,7 +35,11 @@ exports.listar = async (req, res) => {
     const manifestacoes = await Manifestacao.findAll({
       include: [
         { model: Usuario, attributes: ['idUsuario', 'nome', 'email'] },
-        { model: Resposta, attributes: ['idResposta', 'texto'] }
+        {
+          model: Resposta,
+          attributes: ['idResposta', 'texto', 'createdAt'],
+          include: [{ model: Usuario, attributes: ['idUsuario', 'nome', 'tipoUsuario'] }]
+        }
       ]
     });
     return res.json(manifestacoes);
@@ -54,7 +58,11 @@ exports.buscar = async (req, res) => {
     const manifestacao = await Manifestacao.findByPk(id, {
       include: [
         { model: Usuario, attributes: ['idUsuario', 'nome'] },
-        { model: Resposta, attributes: ['idResposta', 'texto'] }
+        {
+          model: Resposta,
+          attributes: ['idResposta', 'texto', 'createdAt'],
+          include: [{ model: Usuario, attributes: ['idUsuario', 'nome', 'tipoUsuario'] }]
+        }
       ]
     });
     if (!manifestacao) {

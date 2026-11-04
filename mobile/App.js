@@ -45,6 +45,9 @@ export default function App() {
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [imagem, setImagem] = useState(null);
+  const [respostaDrafts, setRespostaDrafts] = useState({});
+  const [respostaStatus, setRespostaStatus] = useState({});
+  const [respostaEnviando, setRespostaEnviando] = useState(null);
 
   useEffect(() => {
     if (screen === 'dashboard' && token) {
@@ -181,6 +184,31 @@ export default function App() {
       setStatus(error.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function sendResposta(manifestacao) {
+    const id = manifestacao.idManifestacao;
+    const texto = (respostaDrafts[id] || '').trim();
+    if (!texto) {
+      setRespostaStatus((current) => ({ ...current, [id]: 'Escreva uma resposta antes de enviar.' }));
+      return;
+    }
+
+    setRespostaEnviando(id);
+    setRespostaStatus((current) => ({ ...current, [id]: '' }));
+    try {
+      await request('/respostas', {
+        method: 'POST',
+        body: JSON.stringify({ texto, idManifestacao: id }),
+      });
+      setRespostaDrafts((current) => ({ ...current, [id]: '' }));
+      setRespostaStatus((current) => ({ ...current, [id]: 'Resposta enviada.' }));
+      await loadManifestacoes();
+    } catch (error) {
+      setRespostaStatus((current) => ({ ...current, [id]: error.message }));
+    } finally {
+      setRespostaEnviando(null);
     }
   }
 
@@ -359,6 +387,35 @@ export default function App() {
             <Text style={styles.manifestacaoText}>{item.descricao}</Text>
             {item.imagem && <Image source={{ uri: item.imagem }} style={styles.manifestationImage} resizeMode="cover" />}
             <Text style={styles.manifestacaoStatus}>{item.status || 'Pendente'}</Text>
+
+            {(item.Respostas || item.respostas || []).map((resposta) => (
+              <View style={styles.respostaCard} key={resposta.idResposta}>
+                <Text style={styles.respostaAutor}>
+                  {resposta.Usuario?.nome || 'Equipe SODA'}
+                  {resposta.Usuario?.tipoUsuario ? ` · ${profileLabel(resposta.Usuario.tipoUsuario)}` : ''}
+                </Text>
+                <Text style={styles.respostaTexto}>{resposta.texto}</Text>
+              </View>
+            ))}
+
+            {(['professor', 'servidor', 'coordenador', 'admin'].includes(user?.tipoUsuario)) && item.status !== 'concluida' && (
+              <View style={styles.respostaForm}>
+                <TextInput
+                  style={[styles.input, styles.respostaInput]}
+                  value={respostaDrafts[item.idManifestacao] || ''}
+                  onChangeText={(value) => setRespostaDrafts((current) => ({ ...current, [item.idManifestacao]: value }))}
+                  placeholder="Escreva uma resposta para o aluno"
+                  placeholderTextColor="#9aaab5"
+                  multiline
+                />
+                <Pressable style={styles.respostaButton} onPress={() => sendResposta(item)} disabled={respostaEnviando === item.idManifestacao}>
+                  {respostaEnviando === item.idManifestacao
+                    ? <ActivityIndicator color="#112b3a" />
+                    : <Text style={styles.buttonText}>Responder</Text>}
+                </Pressable>
+                {!!respostaStatus[item.idManifestacao] && <Text style={styles.status}>{respostaStatus[item.idManifestacao]}</Text>}
+              </View>
+            )}
           </View>
         ))}
       </>
@@ -440,4 +497,10 @@ const styles = StyleSheet.create({
   manifestacaoText: { color: '#eaf3f8', lineHeight: 20 },
   manifestationImage: { width: '100%', height: 190, borderRadius: 8, marginTop: 10, backgroundColor: '#1b4053' },
   manifestacaoStatus: { color: '#ffcf9d', marginTop: 8, fontSize: 13 },
+  respostaCard: { backgroundColor: '#1b4053', borderRadius: 9, padding: 12, marginTop: 12 },
+  respostaAutor: { color: '#59d4b1', fontWeight: 'bold', marginBottom: 5 },
+  respostaTexto: { color: '#eaf3f8', lineHeight: 20 },
+  respostaForm: { borderTopColor: 'rgba(255,255,255,0.12)', borderTopWidth: 1, marginTop: 14, paddingTop: 12 },
+  respostaInput: { minHeight: 76, textAlignVertical: 'top' },
+  respostaButton: { backgroundColor: '#59d4b1', padding: 13, borderRadius: 10, alignItems: 'center', marginTop: 10 },
 });
