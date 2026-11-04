@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS manifestacoes (
 
     descricao TEXT NOT NULL,
 
+    imagem LONGTEXT NULL,
+
     status ENUM(
         'aberta',
         'em andamento',

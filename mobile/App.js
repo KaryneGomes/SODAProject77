@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
+  Image,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   Pressable,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import Perfil from './src/Perfil';
 
 const API_BASE_URL = (
@@ -42,6 +44,7 @@ export default function App() {
   const [manifestacoes, setManifestacoes] = useState([]);
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [imagem, setImagem] = useState(null);
 
   useEffect(() => {
     if (screen === 'dashboard' && token) {
@@ -167,16 +170,51 @@ export default function App() {
     try {
       await request('/manifestacoes', {
         method: 'POST',
-        body: JSON.stringify({ titulo: titulo.trim(), descricao: descricao.trim() }),
+        body: JSON.stringify({ titulo: titulo.trim(), descricao: descricao.trim(), imagem }),
       });
       setTitulo('');
       setDescricao('');
+      setImagem(null);
       setStatus('Manifestação criada com sucesso.');
       loadManifestacoes();
     } catch (error) {
       setStatus(error.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function pickManifestacaoImage() {
+    setStatus('');
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setStatus('Permita o acesso às fotos para anexar uma imagem.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.65,
+        base64: true,
+      });
+      if (result.canceled) return;
+
+      const selected = result.assets[0];
+      if (!selected.base64) {
+        setStatus('Não foi possível ler essa imagem. Escolha outra foto.');
+        return;
+      }
+      if (selected.base64.length > 7 * 1024 * 1024) {
+        setStatus('A imagem ficou grande demais. Escolha uma foto menor.');
+        return;
+      }
+
+      setImagem(`data:image/jpeg;base64,${selected.base64}`);
+    } catch (error) {
+      setStatus('Não foi possível abrir a galeria de imagens.');
     }
   }
 
@@ -301,6 +339,17 @@ export default function App() {
           <Text style={styles.sectionTitle}>Nova manifestação</Text>
           <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título" placeholderTextColor="#9aaab5" />
           <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
+          <Pressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
+            <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
+          </Pressable>
+          {imagem && (
+            <View>
+              <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
+              <Pressable onPress={() => setImagem(null)}>
+                <Text style={styles.removeImage}>Remover imagem</Text>
+              </Pressable>
+            </View>
+          )}
           <Pressable style={styles.button} onPress={createManifestacao} disabled={loading}><Text style={styles.buttonText}>Enviar manifestação</Text></Pressable>
         </View>
         <Text style={styles.sectionTitle}>Manifestações</Text>
@@ -308,6 +357,7 @@ export default function App() {
           <View style={styles.manifestacao} key={item.idManifestacao || item.id}>
             <Text style={styles.manifestacaoTitle}>{item.titulo}</Text>
             <Text style={styles.manifestacaoText}>{item.descricao}</Text>
+            {item.imagem && <Image source={{ uri: item.imagem }} style={styles.manifestationImage} resizeMode="cover" />}
             <Text style={styles.manifestacaoStatus}>{item.status || 'Pendente'}</Text>
           </View>
         ))}
@@ -357,6 +407,9 @@ const styles = StyleSheet.create({
   label: { color: 'white', marginTop: 12, marginBottom: 7 },
   input: { backgroundColor: '#4a555f', borderRadius: 10, padding: 14, color: 'white', minHeight: 50, fontSize: 16 },
   textarea: { minHeight: 100, textAlignVertical: 'top', marginTop: 12 },
+  imageButton: { borderColor: '#59d4b1', borderWidth: 1, padding: 13, borderRadius: 10, alignItems: 'center', marginTop: 14 },
+  imagePreview: { width: '100%', height: 190, borderRadius: 10, marginTop: 12, backgroundColor: '#315267' },
+  removeImage: { color: '#ffcf9d', textAlign: 'center', marginTop: 8 },
   select: { minHeight: 52, paddingHorizontal: 14, borderRadius: 10, backgroundColor: '#4a555f', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   selectText: { color: 'white', fontSize: 16 },
   selectArrow: { color: '#59d4b1', fontSize: 14 },
@@ -385,5 +438,6 @@ const styles = StyleSheet.create({
   manifestacao: { backgroundColor: '#315267', borderRadius: 10, padding: 14, marginBottom: 10 },
   manifestacaoTitle: { color: '#59d4b1', fontWeight: 'bold', fontSize: 16, marginBottom: 6 },
   manifestacaoText: { color: '#eaf3f8', lineHeight: 20 },
+  manifestationImage: { width: '100%', height: 190, borderRadius: 8, marginTop: 10, backgroundColor: '#1b4053' },
   manifestacaoStatus: { color: '#ffcf9d', marginTop: 8, fontSize: 13 },
 });

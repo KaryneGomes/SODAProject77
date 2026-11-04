@@ -2,14 +2,25 @@ const { Manifestacao, Usuario, Resposta } = require('../models');
 
 exports.criar = async (req, res) => {
   try {
-    const { titulo, descricao } = req.body;
+    const { titulo, descricao, imagem } = req.body;
     if (!titulo || !descricao) {
       return res.status(400).json({ erro: 'Título e descrição são obrigatórios' });
+    }
+
+    if (imagem) {
+      const imagemValida = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(imagem);
+      if (!imagemValida) {
+        return res.status(400).json({ erro: 'A imagem precisa estar em JPEG, PNG ou WebP.' });
+      }
+      if (imagem.length > 7 * 1024 * 1024) {
+        return res.status(413).json({ erro: 'A imagem deve ter até aproximadamente 5 MB.' });
+      }
     }
 
     const manifestacao = await Manifestacao.create({
       titulo,
       descricao,
+      imagem: imagem || null,
       idUsuario: req.usuario.idUsuario
     });
 

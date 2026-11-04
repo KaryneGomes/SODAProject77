@@ -5,6 +5,7 @@ const Manifestacao = db.define('Manifestacao', {
   idManifestacao: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   titulo: { type: DataTypes.STRING, allowNull: false },
   descricao: { type: DataTypes.TEXT, allowNull: false },
+  imagem: { type: DataTypes.TEXT('long'), allowNull: true },
   status: { type: DataTypes.ENUM('aberta', 'em andamento', 'concluida'), allowNull: false, defaultValue: 'aberta' }
 }, {
   tableName: 'manifestacoes',
