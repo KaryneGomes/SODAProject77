@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
   toast: { position: 'absolute', top: 116, left: 18, right: 18, zIndex: 5, elevation: 5, backgroundColor: '#59d4b1', borderRadius: 12, paddingVertical: 13, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
   toastText: { color: '#112b3a', fontWeight: 'bold', flex: 1, marginRight: 12 },
   toastClose: { color: '#112b3a', fontSize: 24, lineHeight: 25, fontWeight: 'bold' },
-  home: { justifyContent: 'flex-start', alignItems: 'center', flex: 1, paddingTop: 28 },
+  home: { justifyContent: 'flex-start', alignItems: 'center', flex: 1, paddingTop: 8 },
   homeText: { color: '#dceaf3', fontSize: 18, lineHeight: 27, marginBottom: 0, textAlign: 'center', width: '100%' },
   homeActions: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', gap: 14, paddingBottom: 20 },
   homeButton: { width: '88%', maxWidth: 380, alignSelf: 'center', marginTop: 0 },
