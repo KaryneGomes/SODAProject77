@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Usuario } = require('../models');
+const { Usuario, Manifestacao, Resposta } = require('../models');
 
 require('dotenv').config();
 
@@ -342,6 +342,47 @@ exports.buscar = async (req, res) => {
 
   }
 
+};
+
+exports.fotoPerfil = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID inválido' });
+    }
+
+    // Fotos são exibidas no feed público apenas para autores e respondentes
+    // que aparecem em manifestações visíveis nesse feed.
+    const autorPublicado = await Manifestacao.findOne({
+      attributes: ['idManifestacao'],
+      where: { idUsuario: id },
+    });
+    const respondentePublicado = autorPublicado || await Resposta.findOne({
+      attributes: ['idResposta'],
+      where: { idUsuario: id },
+      include: [{ model: Manifestacao, attributes: ['idManifestacao'], required: true }],
+    });
+    if (!respondentePublicado) {
+      return res.status(404).json({ erro: 'Foto de perfil não encontrada' });
+    }
+
+    const usuario = await Usuario.findByPk(id, { attributes: ['fotoPerfil'] });
+    if (!usuario?.fotoPerfil) {
+      return res.status(404).json({ erro: 'Foto de perfil não encontrada' });
+    }
+
+    const imagem = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/i.exec(usuario.fotoPerfil);
+    if (!imagem) {
+      return res.status(404).json({ erro: 'Foto de perfil inválida' });
+    }
+
+    return res
+      .set('Cache-Control', 'private, max-age=3600')
+      .type(imagem[1])
+      .send(Buffer.from(imagem[2], 'base64'));
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
+  }
 };
 
 

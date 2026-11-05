@@ -45,6 +45,11 @@ router.get(
 // ===============================
 
 router.get(
+    '/:id/foto',
+    usuarioController.fotoPerfil
+);
+
+router.get(
     '/:id',
     auth,
     usuarioController.buscar

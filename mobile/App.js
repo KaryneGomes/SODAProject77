@@ -52,6 +52,7 @@ export default function App() {
   const [respostaDrafts, setRespostaDrafts] = useState({});
   const [respostaStatus, setRespostaStatus] = useState({});
   const [respostaEnviando, setRespostaEnviando] = useState(null);
+  const [fotosAutorComErro, setFotosAutorComErro] = useState({});
 
   useEffect(() => {
     if (screen === 'dashboard' && token) {
@@ -146,6 +147,7 @@ export default function App() {
   async function loadManifestacoes() {
     try {
       const data = await request('/manifestacoes');
+      setFotosAutorComErro({});
       setManifestacoes(Array.isArray(data) ? data : []);
     } catch (error) {
       setStatus(error.message);
@@ -385,8 +387,33 @@ export default function App() {
           <Pressable style={styles.button} onPress={createManifestacao} disabled={loading}><Text style={styles.buttonText}>Enviar manifestação</Text></Pressable>
         </View>
         <Text style={styles.sectionTitle}>Manifestações</Text>
-        {manifestacoes.length === 0 ? <Text style={styles.empty}>Nenhuma manifestação encontrada.</Text> : manifestacoes.map((item) => (
+        {manifestacoes.length === 0 ? <Text style={styles.empty}>Nenhuma manifestação encontrada.</Text> : manifestacoes.map((item) => {
+          const autor = item.Usuario || item.usuario || {};
+          const autorNome = autor.nome || 'Usuário';
+          const iniciais = autorNome.trim().charAt(0).toUpperCase();
+          const mostrarFoto = autor.temFoto && !fotosAutorComErro[autor.idUsuario];
+          return (
           <View style={styles.manifestacao} key={item.idManifestacao || item.id}>
+            <View style={styles.manifestacaoAutor}>
+              {mostrarFoto ? (
+                <Image
+                  key={autor.idUsuario}
+                  source={{
+                    uri: `${API_BASE_URL}/usuarios/${autor.idUsuario}/foto`,
+                  }}
+                  style={styles.autorAvatar}
+                  onError={() => setFotosAutorComErro((current) => ({ ...current, [autor.idUsuario]: true }))}
+                />
+              ) : (
+                <View style={[styles.autorAvatar, styles.autorAvatarPlaceholder]}>
+                  <Text style={styles.autorInicial}>{iniciais}</Text>
+                </View>
+              )}
+              <View>
+                <Text style={styles.autorNome}>{autorNome}</Text>
+                <Text style={styles.autorLegenda}>Autor da manifestação</Text>
+              </View>
+            </View>
             <Text style={styles.manifestacaoTitle}>{item.titulo}</Text>
             <Text style={styles.manifestacaoText}>{item.descricao}</Text>
             {item.imagem && <Image source={{ uri: item.imagem }} style={styles.manifestationImage} resizeMode="cover" />}
@@ -394,10 +421,32 @@ export default function App() {
 
             {getManifestacaoRespostas(item).map((resposta) => (
               <View style={styles.respostaCard} key={resposta.idResposta}>
-                <Text style={styles.respostaAutor}>
-                  {resposta.Usuario?.nome || 'Equipe SODA'}
-                  {resposta.Usuario?.tipoUsuario ? ` · ${profileLabel(resposta.Usuario.tipoUsuario)}` : ''}
-                </Text>
+                {(() => {
+                  const respondente = resposta.Usuario || resposta.usuario || {};
+                  const nomeRespondente = respondente.nome || 'Equipe SODA';
+                  const inicialRespondente = nomeRespondente.trim().charAt(0).toUpperCase();
+                  const mostrarFotoRespondente = respondente.temFoto && !fotosAutorComErro[respondente.idUsuario];
+                  return (
+                    <View style={styles.respostaHeader}>
+                      {mostrarFotoRespondente ? (
+                        <Image
+                          key={respondente.idUsuario}
+                          source={{ uri: `${API_BASE_URL}/usuarios/${respondente.idUsuario}/foto` }}
+                          style={styles.respostaAvatar}
+                          onError={() => setFotosAutorComErro((current) => ({ ...current, [respondente.idUsuario]: true }))}
+                        />
+                      ) : (
+                        <View style={[styles.respostaAvatar, styles.respostaAvatarPlaceholder]}>
+                          <Text style={styles.respostaInicial}>{inicialRespondente}</Text>
+                        </View>
+                      )}
+                      <Text style={styles.respostaAutor}>
+                        {nomeRespondente}
+                        {respondente.tipoUsuario ? ` · ${profileLabel(respondente.tipoUsuario)}` : ''}
+                      </Text>
+                    </View>
+                  );
+                })()}
                 <Text style={styles.respostaTexto}>{resposta.texto}</Text>
               </View>
             ))}
@@ -421,7 +470,8 @@ export default function App() {
               </View>
             )}
           </View>
-        ))}
+          );
+        })}
       </>
     );
   }
@@ -500,9 +550,19 @@ const styles = StyleSheet.create({
   manifestacaoTitle: { color: '#59d4b1', fontWeight: 'bold', fontSize: 16, marginBottom: 6 },
   manifestacaoText: { color: '#eaf3f8', lineHeight: 20 },
   manifestationImage: { width: '100%', height: 190, borderRadius: 8, marginTop: 10, backgroundColor: '#1b4053' },
+  manifestacaoAutor: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  autorAvatar: { width: 42, height: 42, borderRadius: 21, marginRight: 10, backgroundColor: '#1b4053' },
+  autorAvatarPlaceholder: { justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#59d4b1' },
+  autorInicial: { color: '#59d4b1', fontWeight: 'bold', fontSize: 18 },
+  autorNome: { color: '#eaf3f8', fontWeight: 'bold' },
+  autorLegenda: { color: '#b9c9d7', fontSize: 12, marginTop: 2 },
   manifestacaoStatus: { color: '#ffcf9d', marginTop: 8, fontSize: 13 },
   respostaCard: { backgroundColor: '#1b4053', borderRadius: 9, padding: 12, marginTop: 12 },
-  respostaAutor: { color: '#59d4b1', fontWeight: 'bold', marginBottom: 5 },
+  respostaHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  respostaAvatar: { width: 30, height: 30, borderRadius: 15, marginRight: 8, backgroundColor: '#1b4053' },
+  respostaAvatarPlaceholder: { justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#59d4b1' },
+  respostaInicial: { color: '#59d4b1', fontWeight: 'bold', fontSize: 13 },
+  respostaAutor: { color: '#59d4b1', fontWeight: 'bold', flexShrink: 1 },
   respostaTexto: { color: '#eaf3f8', lineHeight: 20 },
   respostaForm: { borderTopColor: 'rgba(255,255,255,0.12)', borderTopWidth: 1, marginTop: 14, paddingTop: 12 },
   respostaInput: { minHeight: 76, textAlignVertical: 'top' },

@@ -34,15 +34,31 @@ exports.listar = async (req, res) => {
   try {
     const manifestacoes = await Manifestacao.findAll({
       include: [
-        { model: Usuario, attributes: ['idUsuario', 'nome', 'email'] },
+        { model: Usuario, attributes: ['idUsuario', 'nome', 'fotoPerfil'] },
         {
           model: Resposta,
           attributes: ['idResposta', 'texto', 'createdAt'],
-          include: [{ model: Usuario, attributes: ['idUsuario', 'nome', 'tipoUsuario'] }]
+          include: [{ model: Usuario, attributes: ['idUsuario', 'nome', 'tipoUsuario', 'fotoPerfil'] }]
         }
       ]
     });
-    return res.json(manifestacoes);
+    const resultado = manifestacoes.map((manifestacao) => {
+      const dados = manifestacao.toJSON();
+      if (dados.Usuario) {
+        dados.Usuario.temFoto = Boolean(dados.Usuario.fotoPerfil);
+        delete dados.Usuario.fotoPerfil;
+      }
+      const respostas = dados.Resposta || dados.Respostas || [];
+      for (const resposta of Array.isArray(respostas) ? respostas : [respostas]) {
+        const respondente = resposta?.Usuario || resposta?.usuario;
+        if (respondente) {
+          respondente.temFoto = Boolean(respondente.fotoPerfil);
+          delete respondente.fotoPerfil;
+        }
+      }
+      return dados;
+    });
+    return res.json(resultado);
   } catch (error) {
     return res.status(500).json({ erro: error.message });
   }
@@ -57,7 +73,7 @@ exports.buscar = async (req, res) => {
 
     const manifestacao = await Manifestacao.findByPk(id, {
       include: [
-        { model: Usuario, attributes: ['idUsuario', 'nome'] },
+        { model: Usuario, attributes: ['idUsuario', 'nome', 'fotoPerfil'] },
         {
           model: Resposta,
           attributes: ['idResposta', 'texto', 'createdAt'],
@@ -69,7 +85,12 @@ exports.buscar = async (req, res) => {
       return res.status(404).json({ erro: 'Manifestação não encontrada' });
     }
 
-    return res.json(manifestacao);
+    const dados = manifestacao.toJSON();
+    if (dados.Usuario) {
+      dados.Usuario.temFoto = Boolean(dados.Usuario.fotoPerfil);
+      delete dados.Usuario.fotoPerfil;
+    }
+    return res.json(dados);
   } catch (error) {
     return res.status(500).json({ erro: error.message });
   }
