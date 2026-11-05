@@ -1,4 +1,24 @@
 const { Manifestacao, Usuario, Resposta } = require('../models');
+const crypto = require('node:crypto');
+
+function prepararFotoPerfil(usuario) {
+  if (!usuario) return;
+
+  usuario.temFoto = Boolean(usuario.fotoPerfil);
+  usuario.fotoVersao = usuario.fotoPerfil
+    ? crypto.createHash('sha256').update(usuario.fotoPerfil).digest('hex')
+    : '';
+  delete usuario.fotoPerfil;
+}
+
+function prepararFotosManifestacao(dados) {
+  prepararFotoPerfil(dados.Usuario || dados.usuario);
+  const respostas = dados.Resposta || dados.Respostas || dados.respostas || [];
+  for (const resposta of Array.isArray(respostas) ? respostas : [respostas]) {
+    prepararFotoPerfil(resposta?.Usuario || resposta?.usuario);
+  }
+  return dados;
+}
 
 exports.criar = async (req, res) => {
   try {
@@ -42,22 +62,7 @@ exports.listar = async (req, res) => {
         }
       ]
     });
-    const resultado = manifestacoes.map((manifestacao) => {
-      const dados = manifestacao.toJSON();
-      if (dados.Usuario) {
-        dados.Usuario.temFoto = Boolean(dados.Usuario.fotoPerfil);
-        delete dados.Usuario.fotoPerfil;
-      }
-      const respostas = dados.Resposta || dados.Respostas || [];
-      for (const resposta of Array.isArray(respostas) ? respostas : [respostas]) {
-        const respondente = resposta?.Usuario || resposta?.usuario;
-        if (respondente) {
-          respondente.temFoto = Boolean(respondente.fotoPerfil);
-          delete respondente.fotoPerfil;
-        }
-      }
-      return dados;
-    });
+    const resultado = manifestacoes.map((manifestacao) => prepararFotosManifestacao(manifestacao.toJSON()));
     return res.json(resultado);
   } catch (error) {
     return res.status(500).json({ erro: error.message });
@@ -77,7 +82,7 @@ exports.buscar = async (req, res) => {
         {
           model: Resposta,
           attributes: ['idResposta', 'texto', 'createdAt'],
-          include: [{ model: Usuario, attributes: ['idUsuario', 'nome', 'tipoUsuario'] }]
+          include: [{ model: Usuario, attributes: ['idUsuario', 'nome', 'tipoUsuario', 'fotoPerfil'] }]
         }
       ]
     });
@@ -85,12 +90,7 @@ exports.buscar = async (req, res) => {
       return res.status(404).json({ erro: 'Manifestação não encontrada' });
     }
 
-    const dados = manifestacao.toJSON();
-    if (dados.Usuario) {
-      dados.Usuario.temFoto = Boolean(dados.Usuario.fotoPerfil);
-      delete dados.Usuario.fotoPerfil;
-    }
-    return res.json(dados);
+    return res.json(prepararFotosManifestacao(manifestacao.toJSON()));
   } catch (error) {
     return res.status(500).json({ erro: error.message });
   }

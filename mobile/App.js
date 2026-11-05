@@ -401,7 +401,7 @@ export default function App() {
                 <Image
                   key={autor.idUsuario}
                   source={{
-                    uri: `${API_BASE_URL}/usuarios/${autor.idUsuario}/foto`,
+                    uri: `${API_BASE_URL}/usuarios/${autor.idUsuario}/foto?v=${autor.fotoVersao || 'sem-foto'}`,
                   }}
                   style={styles.autorAvatar}
                   onError={() => setFotosAutorComErro((current) => ({ ...current, [autor.idUsuario]: true }))}
@@ -433,7 +433,7 @@ export default function App() {
                       {mostrarFotoRespondente ? (
                         <Image
                           key={respondente.idUsuario}
-                          source={{ uri: `${API_BASE_URL}/usuarios/${respondente.idUsuario}/foto` }}
+                          source={{ uri: `${API_BASE_URL}/usuarios/${respondente.idUsuario}/foto?v=${respondente.fotoVersao || 'sem-foto'}` }}
                           style={styles.respostaAvatar}
                           onError={() => setFotosAutorComErro((current) => ({ ...current, [respondente.idUsuario]: true }))}
                         />
