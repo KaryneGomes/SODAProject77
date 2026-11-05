@@ -507,8 +507,10 @@ export default function App() {
         {screen === 'home' && (
           <View style={styles.home}>
             <Text style={styles.homeText}>Um espaço seguro para ouvir, dialogar e transformar.</Text>
-            <Pressable style={[styles.button, styles.homeButton]} onPress={() => { setLoginMode(true); setScreen('auth'); }}><Text style={styles.buttonText}>Entrar no sistema</Text></Pressable>
-            <Pressable style={[styles.outlineButton, styles.homeButton]} onPress={() => { setLoginMode(false); setScreen('auth'); }}><Text style={styles.outlineText}>Criar uma conta</Text></Pressable>
+            <View style={styles.homeActions}>
+              <Pressable style={[styles.button, styles.homeButton]} onPress={() => { setLoginMode(true); setScreen('auth'); }}><Text style={styles.buttonText}>Entrar no sistema</Text></Pressable>
+              <Pressable style={[styles.outlineButton, styles.homeButton]} onPress={() => { setLoginMode(false); setScreen('auth'); }}><Text style={styles.outlineText}>Criar uma conta</Text></Pressable>
+            </View>
           </View>
         )}
         {screen === 'auth' && <View style={styles.card}>{renderAuth()}</View>}
@@ -549,8 +551,9 @@ const styles = StyleSheet.create({
   toastText: { color: '#112b3a', fontWeight: 'bold', flex: 1, marginRight: 12 },
   toastClose: { color: '#112b3a', fontSize: 24, lineHeight: 25, fontWeight: 'bold' },
   home: { justifyContent: 'flex-start', alignItems: 'center', flex: 1, paddingTop: 28 },
-  homeText: { color: '#dceaf3', fontSize: 18, lineHeight: 27, marginBottom: 36, textAlign: 'center', width: '100%' },
-  homeButton: { width: '88%', maxWidth: 380, alignSelf: 'center' },
+  homeText: { color: '#dceaf3', fontSize: 18, lineHeight: 27, marginBottom: 0, textAlign: 'center', width: '100%' },
+  homeActions: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', gap: 14, paddingBottom: 20 },
+  homeButton: { width: '88%', maxWidth: 380, alignSelf: 'center', marginTop: 0 },
   card: { backgroundColor: '#1b4053', padding: 22, borderRadius: 20 },
   dashboard: { backgroundColor: '#1b4053', padding: 20, borderRadius: 20 },
   title: { color: 'white', fontSize: 27, fontWeight: 'bold', marginTop: 10 },
