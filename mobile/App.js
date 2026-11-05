@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
@@ -53,6 +53,27 @@ export default function App() {
   const [respostaStatus, setRespostaStatus] = useState({});
   const [respostaEnviando, setRespostaEnviando] = useState(null);
   const [fotosAutorComErro, setFotosAutorComErro] = useState({});
+  const [profileToast, setProfileToast] = useState('');
+  const profileToastTimer = useRef(null);
+
+  function dismissProfileToast() {
+    if (profileToastTimer.current) clearTimeout(profileToastTimer.current);
+    profileToastTimer.current = null;
+    setProfileToast('');
+  }
+
+  function showProfileToast(message) {
+    if (profileToastTimer.current) clearTimeout(profileToastTimer.current);
+    setProfileToast(message);
+    profileToastTimer.current = setTimeout(() => {
+      profileToastTimer.current = null;
+      setProfileToast('');
+    }, 5000);
+  }
+
+  useEffect(() => () => {
+    if (profileToastTimer.current) clearTimeout(profileToastTimer.current);
+  }, []);
 
   useEffect(() => {
     if (screen === 'dashboard' && token) {
@@ -259,15 +280,6 @@ export default function App() {
     setScreen('home');
   }
 
-  function renderHeader() {
-    return (
-      <View style={styles.brandBlock}>
-        <Text style={styles.logo}>SODA</Text>
-        <Text style={styles.sub}>Sistema de Ouvidoria Digital Acadêmica</Text>
-      </View>
-    );
-  }
-
   function renderAuth() {
     const fieldsByProfile = {
       aluno: [
@@ -355,16 +367,6 @@ export default function App() {
   function renderDashboard() {
     return (
       <>
-        <View style={styles.dashboardHeader}>
-          <View>
-            <Text style={styles.logo}>SODA</Text>
-            <Text style={styles.welcome}>Bem-vindo, {user?.nome || 'usuário'}</Text>
-          </View>
-          <View style={styles.headerActions}>
-            <Pressable onPress={openProfile}><Text style={styles.logout}>Meu perfil</Text></Pressable>
-            <Pressable onPress={logout}><Text style={styles.logout}>Sair</Text></Pressable>
-          </View>
-        </View>
         <View style={styles.infoGrid}>
           <View style={styles.infoItem}><Text style={styles.infoLabel}>E-mail</Text><Text style={styles.infoValue}>{user?.email || '-'}</Text></View>
           <View style={styles.infoItem}><Text style={styles.infoLabel}>Perfil</Text><Text style={styles.infoValue}>{user?.tipoUsuario || '-'}</Text></View>
@@ -479,37 +481,74 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
+      <View style={styles.appHeader}>
+        <Pressable onPress={() => setScreen(user ? 'dashboard' : 'home')} style={styles.appBrand}>
+          <Text style={styles.appLogo}>SODA</Text>
+          <Text style={styles.appTagline}>Ouvidoria digital acadêmica</Text>
+        </Pressable>
+        <View style={styles.appHeaderActions}>
+          {user && <Text style={styles.appHeaderUser} numberOfLines={1}>{user.nome || 'Usuário'}</Text>}
+          {user && (
+            <Pressable
+              style={styles.appHeaderButton}
+              onPress={screen === 'profile' ? () => setScreen('dashboard') : openProfile}
+            >
+              <Text style={styles.appHeaderButtonText}>{screen === 'profile' ? 'Início' : 'Perfil'}</Text>
+            </Pressable>
+          )}
+          {user && (
+            <Pressable style={styles.appHeaderButton} onPress={logout}>
+              <Text style={styles.appHeaderButtonText}>Sair</Text>
+            </Pressable>
+          )}
+        </View>
+      </View>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {screen === 'home' && (
           <View style={styles.home}>
-            {renderHeader()}
             <Text style={styles.homeText}>Um espaço seguro para ouvir, dialogar e transformar.</Text>
             <Pressable style={styles.button} onPress={() => { setLoginMode(true); setScreen('auth'); }}><Text style={styles.buttonText}>Entrar no sistema</Text></Pressable>
             <Pressable style={styles.outlineButton} onPress={() => { setLoginMode(false); setScreen('auth'); }}><Text style={styles.outlineText}>Criar uma conta</Text></Pressable>
           </View>
         )}
-        {screen === 'auth' && <View style={styles.card}>{renderHeader()}{renderAuth()}</View>}
+        {screen === 'auth' && <View style={styles.card}>{renderAuth()}</View>}
         {screen === 'dashboard' && <View style={styles.dashboard}>{renderDashboard()}</View>}
         {screen === 'profile' && (
           <Perfil
             user={user}
             request={request}
-            onBack={() => setScreen('dashboard')}
             onSaved={(updatedUser) => setUser((current) => ({ ...current, ...updatedUser }))}
+            onPhotoSaved={(message) => showProfileToast(message)}
           />
         )}
       </ScrollView>
+      {!!profileToast && (
+        <View style={styles.toast} accessibilityRole="alert">
+          <Text style={styles.toastText}>{profileToast}</Text>
+          <Pressable onPress={dismissProfileToast} hitSlop={10} accessibilityLabel="Fechar aviso">
+            <Text style={styles.toastClose}>×</Text>
+          </Pressable>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#112b3a' },
-  content: { flexGrow: 1, justifyContent: 'center', padding: 22 },
+  content: { flexGrow: 1, justifyContent: 'center', padding: 22, paddingTop: 18 },
+  appHeader: { minHeight: 70, paddingHorizontal: 20, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0d2532', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', zIndex: 2 },
+  appBrand: { flexShrink: 1 },
+  appLogo: { color: '#59d4b1', fontSize: 24, fontWeight: 'bold', letterSpacing: 3 },
+  appTagline: { color: '#b9c9d7', fontSize: 11, marginTop: 1 },
+  appHeaderActions: { flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 10 },
+  appHeaderUser: { color: '#dceaf3', fontSize: 12, maxWidth: 92 },
+  appHeaderButton: { paddingVertical: 8, paddingHorizontal: 7 },
+  appHeaderButtonText: { color: '#59d4b1', fontWeight: 'bold', fontSize: 13 },
+  toast: { position: 'absolute', top: 78, left: 18, right: 18, zIndex: 5, elevation: 5, backgroundColor: '#59d4b1', borderRadius: 12, paddingVertical: 13, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  toastText: { color: '#112b3a', fontWeight: 'bold', flex: 1, marginRight: 12 },
+  toastClose: { color: '#112b3a', fontSize: 24, lineHeight: 25, fontWeight: 'bold' },
   home: { justifyContent: 'center', flex: 1 },
-  brandBlock: { marginBottom: 28 },
-  logo: { color: '#59d4b1', fontSize: 42, fontWeight: 'bold', letterSpacing: 5 },
-  sub: { color: '#dceaf3', marginTop: 8, lineHeight: 20 },
   homeText: { color: '#dceaf3', fontSize: 17, lineHeight: 25, marginBottom: 28 },
   card: { backgroundColor: '#1b4053', padding: 22, borderRadius: 20 },
   dashboard: { backgroundColor: '#1b4053', padding: 20, borderRadius: 20 },
@@ -535,10 +574,6 @@ const styles = StyleSheet.create({
   switch: { color: '#59d4b1', textAlign: 'center', marginTop: 18 },
   back: { marginBottom: 4 },
   backText: { color: '#b9c9d7', fontSize: 15 },
-  dashboardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
-  headerActions: { alignItems: 'flex-end', gap: 4 },
-  welcome: { color: '#dceaf3', fontSize: 16, marginTop: 6 },
-  logout: { color: '#59d4b1', fontWeight: 'bold', padding: 8 },
   infoGrid: { gap: 10, marginBottom: 22 },
   infoItem: { backgroundColor: '#315267', borderRadius: 10, padding: 14 },
   infoLabel: { color: '#59d4b1', fontWeight: 'bold', marginBottom: 4 },

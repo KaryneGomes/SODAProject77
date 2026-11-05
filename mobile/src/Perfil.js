@@ -32,7 +32,7 @@ const fieldsByProfile = {
   ],
 };
 
-export default function Perfil({ user, request, onBack, onSaved }) {
+export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
   const [draft, setDraft] = useState(user || {});
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,6 +43,7 @@ export default function Perfil({ user, request, onBack, onSaved }) {
   }
 
   async function saveProfile() {
+    const fotoMudou = (draft.fotoPerfil || null) !== (user?.fotoPerfil || null);
     setLoading(true);
     setStatus('');
     try {
@@ -62,6 +63,9 @@ export default function Perfil({ user, request, onBack, onSaved }) {
       });
       onSaved(draft);
       setStatus('Perfil atualizado com sucesso.');
+      if (fotoMudou) {
+        onPhotoSaved?.(draft.fotoPerfil ? 'Foto de perfil atualizada.' : 'Foto de perfil removida.');
+      }
     } catch (error) {
       setStatus(error.message);
     } finally {
@@ -105,9 +109,6 @@ export default function Perfil({ user, request, onBack, onSaved }) {
 
   return (
     <View style={styles.card}>
-      <Pressable onPress={onBack}>
-        <Text style={styles.backText}>← Voltar ao dashboard</Text>
-      </Pressable>
       <Text style={styles.title}>Meu perfil</Text>
       <Text style={styles.subtitle}>Dados de {profileLabel(user?.tipoUsuario || 'aluno')}</Text>
 
