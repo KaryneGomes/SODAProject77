@@ -409,7 +409,7 @@ export default function App() {
       return (
         <>
           <FeedbackPressable style={styles.composerBack} onPress={() => { setComposerOpen(false); setStatus(''); }}>
-            <Text style={styles.backText}>← Voltar</Text>
+            <Text style={styles.backArrow} accessibilityLabel="Voltar">←</Text>
           </FeedbackPressable>
           <View style={styles.dashboard}>
             <Text style={styles.sectionTitle}>Escrever manifestação</Text>
@@ -684,7 +684,8 @@ const styles = StyleSheet.create({
   summaryText: { color: '#b9c9d7', fontSize: 15, lineHeight: 22, marginTop: 10 },
   feedHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   feedWriteButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 9, paddingVertical: 8, paddingHorizontal: 12 },
-  composerBack: { alignSelf: 'flex-start', marginBottom: 12 },
+  composerBack: { alignSelf: 'flex-start', marginBottom: 12, width: 42, height: 42, alignItems: 'center', justifyContent: 'center' },
+  backArrow: { color: '#b9c9d7', fontSize: 32, lineHeight: 36 },
   writeButtonExternal: { alignSelf: 'flex-end', minWidth: 144, marginTop: 16, marginBottom: 8 },
   composerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   cancelButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 8, paddingVertical: 7, paddingHorizontal: 10 },
