@@ -57,7 +57,10 @@ export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
         : 'Use seu e-mail @ifpe.edu.br ou o domínio oficial do seu campus.');
       return;
     }
-    for (const [field, label] of [['matricula', 'Matrícula'], ['siape', 'SIAPE']]) {
+    const camposNumericos = user?.tipoUsuario === 'servidor'
+      ? [['matricula', 'Matrícula'], ['siape', 'SIAPE']]
+      : [['matricula', 'Matrícula']];
+    for (const [field, label] of camposNumericos) {
       if (draft[field] && String(draft[field]).trim() !== String(user?.[field] || '').trim() && !/^\d{7}$/.test(String(draft[field]).trim())) {
         setStatus(`${label} deve ter exatamente 7 números.`);
         return;

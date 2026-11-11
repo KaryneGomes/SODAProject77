@@ -93,7 +93,7 @@ exports.cadastrar = async (req, res) => {
     if (matricula && !temSeteDigitos(matricula)) {
       return res.status(400).json({ erro: 'A matrícula deve ter exatamente 7 números.' });
     }
-    if (siape && !temSeteDigitos(siape)) {
+    if (tipoUsuario === 'servidor' && siape && !temSeteDigitos(siape)) {
       return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
     }
 
@@ -139,7 +139,7 @@ exports.cadastrar = async (req, res) => {
 
       disciplina: disciplina || null,
 
-      siape: siape || null,
+      siape: tipoUsuario === 'servidor' ? (siape || null) : null,
 
       cargo: cargo || null
 
@@ -508,7 +508,7 @@ exports.editar = async (req, res) => {
       if (matricula !== undefined && String(matricula).trim() !== String(usuario.matricula || '').trim() && String(matricula).trim() && !temSeteDigitos(matricula)) {
         return res.status(400).json({ erro: 'A matrícula deve ter exatamente 7 números.' });
       }
-      if (siape !== undefined && String(siape).trim() !== String(usuario.siape || '').trim() && String(siape).trim() && !temSeteDigitos(siape)) {
+      if (usuario.tipoUsuario === 'servidor' && siape !== undefined && String(siape).trim() !== String(usuario.siape || '').trim() && String(siape).trim() && !temSeteDigitos(siape)) {
         return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
       }
 
@@ -577,7 +577,7 @@ exports.editar = async (req, res) => {
     }
 
 
-    if (siape !== undefined) {
+    if (siape !== undefined && usuario.tipoUsuario === 'servidor') {
       if (String(siape).trim() !== String(usuario.siape || '').trim() && String(siape).trim() && !temSeteDigitos(siape)) {
         return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
       }
