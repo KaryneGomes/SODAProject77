@@ -596,7 +596,10 @@ export default function App() {
           )}
         </View>
       </View>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={screen === 'dashboard' && composerOpen ? styles.composerContent : styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         {screen === 'home' && (
           <View style={styles.home}>
             <Text style={styles.homeText}>Um espaço seguro para ouvir, dialogar e transformar.</Text>
@@ -632,6 +635,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#112b3a' },
   content: { flexGrow: 1, justifyContent: 'center', padding: 22, paddingTop: 18 },
+  composerContent: { flexGrow: 1, justifyContent: 'flex-start', padding: 22, paddingTop: 4 },
   appHeader: { minHeight: 108, paddingHorizontal: 24, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0d2532', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', zIndex: 2 },
   appBrand: { flexShrink: 1 },
   appLogo: { color: '#59d4b1', fontSize: 34, fontWeight: 'bold', letterSpacing: 4 },
