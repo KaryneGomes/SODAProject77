@@ -405,6 +405,36 @@ export default function App() {
   }
 
   function renderDashboard() {
+    if (composerOpen) {
+      return (
+        <View style={styles.dashboard}>
+          <View style={styles.composerHeader}>
+            <Text style={styles.sectionTitle}>Escrever manifestação</Text>
+            <FeedbackPressable style={styles.cancelButton} onPress={() => { setComposerOpen(false); setStatus(''); }}>
+              <Text style={styles.outlineText}>Voltar</Text>
+            </FeedbackPressable>
+          </View>
+          {!!status && <Text style={styles.status}>{status}</Text>}
+          <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título da manifestação" placeholderTextColor="#9aaab5" />
+          <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
+          <FeedbackPressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
+            <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
+          </FeedbackPressable>
+          {imagem && (
+            <View>
+              <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
+              <FeedbackPressable onPress={() => setImagem(null)}>
+                <Text style={styles.removeImage}>Remover imagem</Text>
+              </FeedbackPressable>
+            </View>
+          )}
+          <FeedbackPressable style={styles.button} onPress={createManifestacao} disabled={loading}>
+            {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>Publicar manifestação</Text>}
+          </FeedbackPressable>
+        </View>
+      );
+    }
+
     if (!feedVisible) {
       const quantidade = manifestacoes.length;
       return (
@@ -432,7 +462,7 @@ export default function App() {
           </View>
           <FeedbackPressable
             style={[styles.button, styles.writeButtonExternal]}
-            onPress={() => { setFeedVisible(true); setComposerOpen(true); setStatus(''); }}
+            onPress={() => { setComposerOpen(true); setStatus(''); }}
           >
             <Text style={styles.buttonText}>Escrever</Text>
           </FeedbackPressable>
@@ -446,43 +476,11 @@ export default function App() {
           <FeedbackPressable style={styles.back} onPress={() => { setFeedVisible(false); setComposerOpen(false); setStatus(''); }}>
             <Text style={styles.backText}>← Voltar ao resumo</Text>
           </FeedbackPressable>
-          {!composerOpen && (
-            <FeedbackPressable style={styles.feedWriteButton} onPress={() => { setComposerOpen(true); setStatus(''); }}>
-              <Text style={styles.outlineText}>Escrever</Text>
-            </FeedbackPressable>
-          )}
+          <FeedbackPressable style={styles.feedWriteButton} onPress={() => { setComposerOpen(true); setStatus(''); }}>
+            <Text style={styles.outlineText}>Escrever</Text>
+          </FeedbackPressable>
         </View>
         {!!status && <Text style={styles.status}>{status}</Text>}
-        {composerOpen ? (
-          <View style={styles.section}>
-            <View style={styles.composerHeader}>
-              <Text style={styles.sectionTitle}>Escrever manifestação</Text>
-              <FeedbackPressable style={styles.cancelButton} onPress={() => { setComposerOpen(false); setStatus(''); }}>
-                <Text style={styles.outlineText}>Cancelar</Text>
-              </FeedbackPressable>
-            </View>
-            <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título da manifestação" placeholderTextColor="#9aaab5" />
-            <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
-            <FeedbackPressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
-              <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
-            </FeedbackPressable>
-            {imagem && (
-              <View>
-                <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
-                <FeedbackPressable onPress={() => setImagem(null)}>
-                  <Text style={styles.removeImage}>Remover imagem</Text>
-                </FeedbackPressable>
-              </View>
-            )}
-            <FeedbackPressable style={styles.button} onPress={createManifestacao} disabled={loading}>
-              {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>Publicar manifestação</Text>}
-            </FeedbackPressable>
-          </View>
-        ) : (
-          <FeedbackPressable style={[styles.button, styles.writeButton]} onPress={() => { setComposerOpen(true); setStatus(''); }}>
-            <Text style={styles.buttonText}>＋ Escrever manifestação</Text>
-          </FeedbackPressable>
-        )}
         <Text style={styles.sectionTitle}>Feed de manifestações</Text>
         {manifestacoes.length === 0 ? <Text style={styles.empty}>Nenhuma manifestação encontrada.</Text> : manifestacoes.map((item) => {
           const autor = item.Usuario || item.usuario || {};
