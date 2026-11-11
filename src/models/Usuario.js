@@ -67,6 +67,11 @@ const Usuario = db.define('Usuario', {
   cargo: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+
+  fotoPerfil: {
+    type: DataTypes.TEXT('long'),
+    allowNull: true
   }
 
 }, {

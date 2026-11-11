@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
     cargo VARCHAR(255),
 
+    fotoPerfil LONGTEXT NULL,
+
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -58,6 +60,8 @@ CREATE TABLE IF NOT EXISTS manifestacoes (
     titulo VARCHAR(255) NOT NULL,
 
     descricao TEXT NOT NULL,
+
+    imagem LONGTEXT NULL,
 
     status ENUM(
         'aberta',

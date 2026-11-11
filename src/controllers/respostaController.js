@@ -1,4 +1,5 @@
 const { Resposta, Manifestacao, Usuario } = require('../models');
+const { podeResponderManifestacao } = require('../utils/permissoesOuvidoria');
 
 exports.criarResposta = async (req, res) => {
   try {
@@ -14,6 +15,28 @@ exports.criarResposta = async (req, res) => {
 
     if (manifestacao.status === 'concluida') {
       return res.status(400).json({ erro: 'Não é possível responder a uma manifestação concluída' });
+    }
+
+    const autorManifestacao = await Usuario.findByPk(manifestacao.idUsuario, {
+      attributes: ['idUsuario', 'tipoUsuario', 'nome']
+    });
+
+    if (!autorManifestacao) {
+      return res.status(404).json({ erro: 'Autor da manifestação não encontrado' });
+    }
+
+    const usuarioLogado = await Usuario.findByPk(req.usuario.idUsuario, {
+      attributes: ['idUsuario', 'tipoUsuario']
+    });
+
+    if (!usuarioLogado) {
+      return res.status(401).json({ erro: 'Usuário não encontrado' });
+    }
+
+    if (!podeResponderManifestacao(usuarioLogado, autorManifestacao)) {
+      return res.status(403).json({
+        erro: 'Você não tem permissão para responder a esta manifestação com base no cargo e no setor responsável.'
+      });
     }
 
     const resposta = await Resposta.create({

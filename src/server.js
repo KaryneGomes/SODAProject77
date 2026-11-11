@@ -4,7 +4,7 @@ const db = require("./config/database");
 
 const PORT = process.env.PORT || 3000;
 
-db.sync({ alter: true })
+db.sync()
   .then(() => {
     console.log("Banco sincronizado");
     app.listen(PORT, () => {
