@@ -4,6 +4,25 @@ const { Usuario, Manifestacao, Resposta } = require('../models');
 
 require('dotenv').config();
 
+const EMAIL_FORMATO_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function emailInstitucionalValido(email, tipoUsuario) {
+  if (typeof email !== 'string' || !EMAIL_FORMATO_VALIDO.test(email)) return false;
+  const dominio = email.trim().toLowerCase().split('@')[1];
+  if (tipoUsuario === 'aluno') return dominio === 'discente.ifpe.edu.br';
+  return dominio === 'ifpe.edu.br' || (dominio.endsWith('.ifpe.edu.br') && dominio !== 'discente.ifpe.edu.br');
+}
+
+function emailInstitucionalEsperado(tipoUsuario) {
+  return tipoUsuario === 'aluno'
+    ? 'Use seu e-mail institucional @discente.ifpe.edu.br.'
+    : 'Use seu e-mail institucional @ifpe.edu.br ou o domínio oficial do seu campus.';
+}
+
+function temSeteDigitos(valor) {
+  return valor !== undefined && valor !== null && /^\d{7}$/.test(String(valor).trim());
+}
+
 
 // ===============================
 // CADASTRAR USUÁRIO
@@ -27,7 +46,7 @@ exports.cadastrar = async (req, res) => {
 
 
     // Verificar campos obrigatórios
-    if (!nome || !email || !senha || !tipoUsuario) {
+    if (typeof nome !== 'string' || !nome.trim() || typeof email !== 'string' || !email.trim() || typeof senha !== 'string' || !senha || !tipoUsuario) {
       return res.status(400).json({
         erro: 'Nome, email, senha e tipo de usuário são obrigatórios'
       });
@@ -49,17 +68,46 @@ exports.cadastrar = async (req, res) => {
     }
 
 
+    const emailNormalizado = email.trim().toLowerCase();
+
+    if (!emailInstitucionalValido(emailNormalizado, tipoUsuario)) {
+      return res.status(400).json({ erro: emailInstitucionalEsperado(tipoUsuario) });
+    }
+
+    const camposObrigatoriosPorPerfil = {
+      aluno: [matricula, curso, periodo],
+      professor: [matricula, disciplina],
+      servidor: [siape || matricula, cargo],
+      coordenador: [matricula, curso],
+    };
+    if (camposObrigatoriosPorPerfil[tipoUsuario].some((valor) => valor === undefined || valor === null || !String(valor).trim())) {
+      return res.status(400).json({ erro: 'Preencha todos os dados obrigatórios do perfil escolhido.' });
+    }
+
+    if (tipoUsuario !== 'servidor' && !temSeteDigitos(matricula)) {
+      return res.status(400).json({ erro: 'A matrícula IFPE deve ter exatamente 7 números.' });
+    }
+    if (tipoUsuario === 'servidor' && !temSeteDigitos(siape || matricula)) {
+      return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
+    }
+    if (matricula && !temSeteDigitos(matricula)) {
+      return res.status(400).json({ erro: 'A matrícula deve ter exatamente 7 números.' });
+    }
+    if (siape && !temSeteDigitos(siape)) {
+      return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
+    }
+
     // Verificar tamanho da senha
-    if (senha.length < 6) {
+    if (senha.length < 8) {
       return res.status(400).json({
-        erro: 'A senha deve ter pelo menos 6 caracteres'
+        erro: 'A senha deve ter pelo menos 8 caracteres'
       });
     }
 
 
     // Verificar se email já existe
     const existe = await Usuario.findOne({
-      where: { email }
+      where: { email: emailNormalizado }
     });
 
     if (existe) {
@@ -77,7 +125,7 @@ exports.cadastrar = async (req, res) => {
     const usuario = await Usuario.create({
 
       nome,
-      email,
+      email: emailNormalizado,
 
       senha: senhaCriptografada,
 
@@ -143,7 +191,7 @@ exports.login = async (req, res) => {
     } = req.body;
 
 
-    if (!email || !senha) {
+    if (typeof email !== 'string' || !email.trim() || typeof senha !== 'string' || !senha) {
 
       return res.status(400).json({
         erro: 'Email e senha são obrigatórios'
@@ -153,7 +201,7 @@ exports.login = async (req, res) => {
 
 
     const usuario = await Usuario.findOne({
-      where: { email }
+      where: { email: email.trim().toLowerCase() }
     });
 
 
@@ -448,14 +496,24 @@ exports.editar = async (req, res) => {
     }
 
 
-    // Verificar email
-    if (
-      email &&
-      email !== usuario.email
-    ) {
+    const emailNormalizado = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+    // Validar o endereço somente quando ele for alterado para manter contas antigas acessíveis.
+    const emailAtualNormalizado = String(usuario.email || '').trim().toLowerCase();
+    if (emailNormalizado && emailNormalizado !== emailAtualNormalizado) {
+      if (!emailInstitucionalValido(emailNormalizado, usuario.tipoUsuario)) {
+        return res.status(400).json({ erro: emailInstitucionalEsperado(usuario.tipoUsuario) });
+      }
+
+      if (matricula !== undefined && String(matricula).trim() !== String(usuario.matricula || '').trim() && String(matricula).trim() && !temSeteDigitos(matricula)) {
+        return res.status(400).json({ erro: 'A matrícula deve ter exatamente 7 números.' });
+      }
+      if (siape !== undefined && String(siape).trim() !== String(usuario.siape || '').trim() && String(siape).trim() && !temSeteDigitos(siape)) {
+        return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
+      }
 
       const existe = await Usuario.findOne({
-        where: { email }
+        where: { email: emailNormalizado }
       });
 
 
@@ -491,12 +549,15 @@ exports.editar = async (req, res) => {
     }
 
 
-    if (email) {
-      atualizacoes.email = email;
+    if (emailNormalizado && emailNormalizado !== emailAtualNormalizado) {
+      atualizacoes.email = emailNormalizado;
     }
 
 
     if (matricula !== undefined) {
+      if (String(matricula).trim() !== String(usuario.matricula || '').trim() && String(matricula).trim() && !temSeteDigitos(matricula)) {
+        return res.status(400).json({ erro: 'A matrícula deve ter exatamente 7 números.' });
+      }
       atualizacoes.matricula = matricula;
     }
 
@@ -517,6 +578,9 @@ exports.editar = async (req, res) => {
 
 
     if (siape !== undefined) {
+      if (String(siape).trim() !== String(usuario.siape || '').trim() && String(siape).trim() && !temSeteDigitos(siape)) {
+        return res.status(400).json({ erro: 'O SIAPE deve ter exatamente 7 números.' });
+      }
       atualizacoes.siape = siape;
     }
 
@@ -558,10 +622,10 @@ exports.editar = async (req, res) => {
     // Alterar senha
     if (senha) {
 
-      if (senha.length < 6) {
+      if (senha.length < 8) {
 
         return res.status(400).json({
-          erro: 'A senha deve ter pelo menos 6 caracteres'
+          erro: 'A senha deve ter pelo menos 8 caracteres'
         });
 
       }

@@ -9,17 +9,24 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  Pressable,
   View,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Perfil from './src/Perfil';
+import FeedbackPressable from './src/FeedbackPressable';
 
 const API_BASE_URL = (
   process.env.EXPO_PUBLIC_API_BASE_URL ||
   (Platform.OS === 'web' ? 'http://localhost:3000' : '')
 ).replace(/\/+$/, '');
 const profiles = ['aluno', 'professor', 'servidor', 'coordenador'];
+const emailIFPEValido = (email, perfil) => {
+  const normalized = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) return false;
+  const domain = normalized.split('@')[1];
+  if (perfil === 'aluno') return domain === 'discente.ifpe.edu.br';
+  return domain === 'ifpe.edu.br' || (domain.endsWith('.ifpe.edu.br') && domain !== 'discente.ifpe.edu.br');
+};
 
 const profileLabel = (profile) => profile[0].toUpperCase() + profile.slice(1);
 const getManifestacaoRespostas = (manifestacao) => {
@@ -46,6 +53,7 @@ export default function App() {
   const [token, setToken] = useState('');
   const [user, setUser] = useState(null);
   const [manifestacoes, setManifestacoes] = useState([]);
+  const [composerOpen, setComposerOpen] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [imagem, setImagem] = useState(null);
@@ -105,8 +113,20 @@ export default function App() {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setStatus('Informe um endereço de e-mail válido.');
+      return;
+    }
+
     if (!loginMode && senha.length < 8) {
       setStatus('A senha deve ter no mínimo 8 caracteres.');
+      return;
+    }
+
+    if (!loginMode && !emailIFPEValido(email, tipo)) {
+      setStatus(tipo === 'aluno'
+        ? 'Use seu e-mail institucional @discente.ifpe.edu.br.'
+        : 'Use seu e-mail @ifpe.edu.br ou o domínio oficial do seu campus.');
       return;
     }
 
@@ -124,6 +144,16 @@ export default function App() {
 
     if (!loginMode && requiredProfileFields[tipo].some((value) => !value.trim())) {
       setStatus('Preencha todos os requisitos do perfil escolhido.');
+      return;
+    }
+
+    if (!loginMode && tipo !== 'servidor' && !/^\d{7}$/.test(matricula)) {
+      setStatus('A matrícula IFPE deve ter exatamente 7 números.');
+      return;
+    }
+
+    if (!loginMode && tipo === 'servidor' && !/^\d{7}$/.test(matricula)) {
+      setStatus('O SIAPE deve ter exatamente 7 números.');
       return;
     }
 
@@ -205,8 +235,9 @@ export default function App() {
       setTitulo('');
       setDescricao('');
       setImagem(null);
+      setComposerOpen(false);
       setStatus('Manifestação criada com sucesso.');
-      loadManifestacoes();
+      await loadManifestacoes();
     } catch (error) {
       setStatus(error.message);
     } finally {
@@ -283,29 +314,29 @@ export default function App() {
   function renderAuth() {
     const fieldsByProfile = {
       aluno: [
-        ['matricula', 'Matrícula acadêmica', 'Digite sua matrícula', matricula, setMatricula],
+        ['matricula', 'Matrícula acadêmica (7 dígitos)', 'Digite os 7 números', matricula, setMatricula],
         ['curso', 'Curso', 'Digite seu curso', curso, setCurso],
         ['periodo', 'Período / semestre', 'Ex.: 3º período', periodo, setPeriodo],
       ],
       professor: [
-        ['matricula', 'Matrícula', 'Digite sua matrícula', matricula, setMatricula],
+        ['matricula', 'Matrícula funcional (7 dígitos)', 'Digite os 7 números', matricula, setMatricula],
         ['disciplina', 'Disciplina', 'Digite sua disciplina', disciplina, setDisciplina],
       ],
       servidor: [
-        ['matricula', 'SIAPE / matrícula funcional', 'Digite seu SIAPE ou matrícula', matricula, setMatricula],
+        ['matricula', 'SIAPE (7 dígitos)', 'Digite os 7 números do SIAPE', matricula, setMatricula],
         ['cargo', 'Cargo / função', 'Ex.: Técnico administrativo', cargo, setCargo],
       ],
       coordenador: [
-        ['matricula', 'Matrícula', 'Digite sua matrícula', matricula, setMatricula],
+        ['matricula', 'Matrícula funcional (7 dígitos)', 'Digite os 7 números', matricula, setMatricula],
         ['curso', 'Curso coordenado', 'Digite o curso', curso, setCurso],
       ],
     };
 
     return (
       <>
-        <Pressable style={styles.back} onPress={() => setScreen('home')}>
+        <FeedbackPressable style={styles.back} onPress={() => setScreen('home')}>
           <Text style={styles.backText}>← Voltar</Text>
-        </Pressable>
+        </FeedbackPressable>
         <Text style={styles.title}>{loginMode ? 'Bem-vindo de volta' : 'Crie sua conta'}</Text>
         <Text style={styles.subtitle}>{loginMode ? 'Acesse sua conta no SODA.' : 'Preencha os dados para acessar o SODA.'}</Text>
 
@@ -314,16 +345,16 @@ export default function App() {
             <Text style={styles.label}>Nome completo</Text>
             <TextInput style={styles.input} value={nome} onChangeText={setNome} placeholder="Seu nome" placeholderTextColor="#9aaab5" />
             <Text style={styles.label}>Perfil</Text>
-            <Pressable style={styles.select} onPress={() => setPerfilAberto(!perfilAberto)}>
+            <FeedbackPressable style={styles.select} onPress={() => setPerfilAberto(!perfilAberto)}>
               <Text style={styles.selectText}>{profileLabel(tipo)}</Text>
               <Text style={styles.selectArrow}>{perfilAberto ? '▲' : '▼'}</Text>
-            </Pressable>
+            </FeedbackPressable>
             {perfilAberto && (
               <View style={styles.options}>
                 {profiles.map((profile) => (
-                  <Pressable key={profile} style={styles.option} onPress={() => { setTipo(profile); setPerfilAberto(false); }}>
+                  <FeedbackPressable key={profile} style={styles.option} onPress={() => { setTipo(profile); setPerfilAberto(false); }}>
                     <Text style={styles.optionText}>{profileLabel(profile)}</Text>
-                  </Pressable>
+                  </FeedbackPressable>
                 ))}
               </View>
             )}
@@ -334,9 +365,11 @@ export default function App() {
                 <TextInput
                   style={styles.input}
                   value={value}
-                  onChangeText={onChangeText}
+                  onChangeText={(nextValue) => onChangeText(key === 'matricula' ? nextValue.replace(/\D/g, '').slice(0, 7) : nextValue)}
                   placeholder={placeholder}
                   placeholderTextColor="#9aaab5"
+                  keyboardType={key === 'matricula' ? 'number-pad' : 'default'}
+                  maxLength={key === 'matricula' ? 7 : undefined}
                 />
               </View>
             ))}
@@ -344,7 +377,8 @@ export default function App() {
         )}
 
         <Text style={styles.label}>E-mail</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="seu@email.edu.br" placeholderTextColor="#9aaab5" keyboardType="email-address" autoCapitalize="none" />
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder={!loginMode && tipo === 'aluno' ? 'nome@discente.ifpe.edu.br' : 'nome@ifpe.edu.br'} placeholderTextColor="#9aaab5" keyboardType="email-address" autoCapitalize="none" />
+        {!loginMode && <Text style={styles.fieldHint}>{tipo === 'aluno' ? 'Use seu e-mail estudantil do IFPE.' : 'Use seu e-mail institucional do IFPE.'}</Text>}
         <Text style={styles.label}>Senha</Text>
         <TextInput style={styles.input} value={senha} onChangeText={setSenha} placeholder="Sua senha" placeholderTextColor="#9aaab5" secureTextEntry />
         {!loginMode && (
@@ -354,12 +388,12 @@ export default function App() {
           </>
         )}
         {!!status && <Text style={styles.status}>{status}</Text>}
-        <Pressable style={styles.button} onPress={submitAuth} disabled={loading}>
+        <FeedbackPressable style={styles.button} onPress={submitAuth} disabled={loading}>
           {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>{loginMode ? 'Entrar' : 'Cadastrar'}</Text>}
-        </Pressable>
-        <Pressable onPress={() => { setLoginMode(!loginMode); setStatus(''); }}>
+        </FeedbackPressable>
+        <FeedbackPressable onPress={() => { setLoginMode(!loginMode); setStatus(''); }}>
           <Text style={styles.switch}>{loginMode ? 'Ainda não tem conta? Cadastre-se' : 'Já tem conta? Entrar'}</Text>
-        </Pressable>
+        </FeedbackPressable>
       </>
     );
   }
@@ -371,24 +405,38 @@ export default function App() {
           <View style={styles.infoItem}><Text style={styles.infoLabel}>E-mail</Text><Text style={styles.infoValue}>{user?.email || '-'}</Text></View>
           <View style={styles.infoItem}><Text style={styles.infoLabel}>Perfil</Text><Text style={styles.infoValue}>{user?.tipoUsuario || '-'}</Text></View>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nova manifestação</Text>
-          <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título" placeholderTextColor="#9aaab5" />
-          <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
-          <Pressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
-            <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
-          </Pressable>
-          {imagem && (
-            <View>
-              <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
-              <Pressable onPress={() => setImagem(null)}>
-                <Text style={styles.removeImage}>Remover imagem</Text>
-              </Pressable>
+        {!!status && <Text style={styles.status}>{status}</Text>}
+        {composerOpen ? (
+          <View style={styles.section}>
+            <View style={styles.composerHeader}>
+              <Text style={styles.sectionTitle}>Escrever manifestação</Text>
+              <FeedbackPressable style={styles.cancelButton} onPress={() => { setComposerOpen(false); setStatus(''); }}>
+                <Text style={styles.outlineText}>Cancelar</Text>
+              </FeedbackPressable>
             </View>
-          )}
-          <Pressable style={styles.button} onPress={createManifestacao} disabled={loading}><Text style={styles.buttonText}>Enviar manifestação</Text></Pressable>
-        </View>
-        <Text style={styles.sectionTitle}>Manifestações</Text>
+            <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título da manifestação" placeholderTextColor="#9aaab5" />
+            <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
+            <FeedbackPressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
+              <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
+            </FeedbackPressable>
+            {imagem && (
+              <View>
+                <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
+                <FeedbackPressable onPress={() => setImagem(null)}>
+                  <Text style={styles.removeImage}>Remover imagem</Text>
+                </FeedbackPressable>
+              </View>
+            )}
+            <FeedbackPressable style={styles.button} onPress={createManifestacao} disabled={loading}>
+              {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>Publicar manifestação</Text>}
+            </FeedbackPressable>
+          </View>
+        ) : (
+          <FeedbackPressable style={[styles.button, styles.writeButton]} onPress={() => { setComposerOpen(true); setStatus(''); }}>
+            <Text style={styles.buttonText}>＋ Escrever manifestação</Text>
+          </FeedbackPressable>
+        )}
+        <Text style={styles.sectionTitle}>Feed de manifestações</Text>
         {manifestacoes.length === 0 ? <Text style={styles.empty}>Nenhuma manifestação encontrada.</Text> : manifestacoes.map((item) => {
           const autor = item.Usuario || item.usuario || {};
           const autorNome = autor.nome || 'Usuário';
@@ -463,11 +511,11 @@ export default function App() {
                   placeholderTextColor="#9aaab5"
                   multiline
                 />
-                <Pressable style={styles.respostaButton} onPress={() => sendResposta(item)} disabled={respostaEnviando === item.idManifestacao}>
+                <FeedbackPressable style={styles.respostaButton} onPress={() => sendResposta(item)} disabled={respostaEnviando === item.idManifestacao}>
                   {respostaEnviando === item.idManifestacao
                     ? <ActivityIndicator color="#112b3a" />
                     : <Text style={styles.buttonText}>Responder</Text>}
-                </Pressable>
+                </FeedbackPressable>
                 {!!respostaStatus[item.idManifestacao] && <Text style={styles.status}>{respostaStatus[item.idManifestacao]}</Text>}
               </View>
             )}
@@ -482,24 +530,24 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
       <View style={styles.appHeader}>
-        <Pressable onPress={() => setScreen(user ? 'dashboard' : 'home')} style={styles.appBrand}>
+        <FeedbackPressable onPress={() => setScreen(user ? 'dashboard' : 'home')} style={styles.appBrand}>
           <Text style={styles.appLogo}>SODA</Text>
           <Text style={styles.appTagline}>Ouvidoria digital acadêmica</Text>
-        </Pressable>
+        </FeedbackPressable>
         <View style={styles.appHeaderActions}>
           {user && <Text style={styles.appHeaderUser} numberOfLines={1}>{user.nome || 'Usuário'}</Text>}
           {user && (
-            <Pressable
+            <FeedbackPressable
               style={styles.appHeaderButton}
               onPress={screen === 'profile' ? () => setScreen('dashboard') : openProfile}
             >
               <Text style={styles.appHeaderButtonText}>{screen === 'profile' ? 'Início' : 'Perfil'}</Text>
-            </Pressable>
+            </FeedbackPressable>
           )}
           {user && (
-            <Pressable style={styles.appHeaderButton} onPress={logout}>
+            <FeedbackPressable style={styles.appHeaderButton} onPress={logout}>
               <Text style={styles.appHeaderButtonText}>Sair</Text>
-            </Pressable>
+            </FeedbackPressable>
           )}
         </View>
       </View>
@@ -508,8 +556,8 @@ export default function App() {
           <View style={styles.home}>
             <Text style={styles.homeText}>Um espaço seguro para ouvir, dialogar e transformar.</Text>
             <View style={styles.homeActions}>
-              <Pressable style={[styles.button, styles.homeButton]} onPress={() => { setLoginMode(true); setScreen('auth'); }}><Text style={styles.buttonText}>Entrar no sistema</Text></Pressable>
-              <Pressable style={[styles.outlineButton, styles.homeButton]} onPress={() => { setLoginMode(false); setScreen('auth'); }}><Text style={styles.outlineText}>Criar uma conta</Text></Pressable>
+              <FeedbackPressable style={[styles.button, styles.homeButton]} onPress={() => { setLoginMode(true); setScreen('auth'); }}><Text style={styles.buttonText}>Entrar no sistema</Text></FeedbackPressable>
+              <FeedbackPressable style={[styles.outlineButton, styles.homeButton]} onPress={() => { setLoginMode(false); setScreen('auth'); }}><Text style={styles.outlineText}>Criar uma conta</Text></FeedbackPressable>
             </View>
           </View>
         )}
@@ -527,9 +575,9 @@ export default function App() {
       {!!profileToast && (
         <View style={styles.toast} accessibilityRole="alert">
           <Text style={styles.toastText}>{profileToast}</Text>
-          <Pressable onPress={dismissProfileToast} hitSlop={10} accessibilityLabel="Fechar aviso">
+          <FeedbackPressable onPress={dismissProfileToast} hitSlop={10} accessibilityLabel="Fechar aviso">
             <Text style={styles.toastClose}>×</Text>
-          </Pressable>
+          </FeedbackPressable>
         </View>
       )}
     </SafeAreaView>
@@ -571,6 +619,8 @@ const styles = StyleSheet.create({
   option: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
   optionText: { color: 'white', fontSize: 15 },
   status: { color: '#ffcf9d', marginTop: 12, lineHeight: 20 },
+  fieldHint: { color: '#b9c9d7', fontSize: 12, marginTop: 6 },
+  pressed: { opacity: 0.78, transform: [{ scale: 0.985 }] },
   button: { backgroundColor: '#59d4b1', padding: 16, borderRadius: 10, alignItems: 'center', marginTop: 20 },
   buttonText: { fontWeight: 'bold', color: '#112b3a', fontSize: 15 },
   outlineButton: { borderColor: '#59d4b1', borderWidth: 1, padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 12 },
@@ -583,6 +633,9 @@ const styles = StyleSheet.create({
   infoLabel: { color: '#59d4b1', fontWeight: 'bold', marginBottom: 4 },
   infoValue: { color: '#eaf3f8' },
   section: { borderTopColor: 'rgba(255,255,255,0.12)', borderTopWidth: 1, paddingTop: 18, marginBottom: 22 },
+  composerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  cancelButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 8, paddingVertical: 7, paddingHorizontal: 10 },
+  writeButton: { marginBottom: 22 },
   sectionTitle: { color: '#eaf3f8', fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   empty: { color: '#b9c9d7', marginBottom: 10 },
   manifestacao: { backgroundColor: '#315267', borderRadius: 10, padding: 14, marginBottom: 10 },

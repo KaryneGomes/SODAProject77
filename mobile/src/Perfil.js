@@ -3,14 +3,21 @@ import * as ImagePicker from 'expo-image-picker';
 import {
   ActivityIndicator,
   Image,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import FeedbackPressable from './FeedbackPressable';
 
 const profileLabel = (profile) => profile[0].toUpperCase() + profile.slice(1);
+const emailIFPEValido = (email, perfil) => {
+  const normalized = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) return false;
+  const domain = normalized.split('@')[1];
+  if (perfil === 'aluno') return domain === 'discente.ifpe.edu.br';
+  return domain === 'ifpe.edu.br' || (domain.endsWith('.ifpe.edu.br') && domain !== 'discente.ifpe.edu.br');
+};
 
 const fieldsByProfile = {
   aluno: [
@@ -44,6 +51,18 @@ export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
 
   async function saveProfile() {
     const fotoMudou = (draft.fotoPerfil || null) !== (user?.fotoPerfil || null);
+    if (draft.email && draft.email.trim().toLowerCase() !== (user?.email || '').toLowerCase() && !emailIFPEValido(draft.email, user?.tipoUsuario)) {
+      setStatus(user?.tipoUsuario === 'aluno'
+        ? 'Use seu e-mail institucional @discente.ifpe.edu.br.'
+        : 'Use seu e-mail @ifpe.edu.br ou o domínio oficial do seu campus.');
+      return;
+    }
+    for (const [field, label] of [['matricula', 'Matrícula'], ['siape', 'SIAPE']]) {
+      if (draft[field] && String(draft[field]).trim() !== String(user?.[field] || '').trim() && !/^\d{7}$/.test(String(draft[field]).trim())) {
+        setStatus(`${label} deve ter exatamente 7 números.`);
+        return;
+      }
+    }
     setLoading(true);
     setStatus('');
     try {
@@ -120,13 +139,13 @@ export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
             <Text style={styles.photoInitial}>{(draft.nome || '?').trim().charAt(0).toUpperCase()}</Text>
           </View>
         )}
-        <Pressable style={styles.photoButton} onPress={pickProfilePhoto} disabled={loading}>
+        <FeedbackPressable style={styles.photoButton} onPress={pickProfilePhoto} disabled={loading}>
           <Text style={styles.photoButtonText}>{draft.fotoPerfil ? 'Trocar foto' : 'Adicionar foto de perfil'}</Text>
-        </Pressable>
+        </FeedbackPressable>
         {draft.fotoPerfil && (
-          <Pressable onPress={() => updateField('fotoPerfil', null)} disabled={loading}>
+          <FeedbackPressable onPress={() => updateField('fotoPerfil', null)} disabled={loading}>
             <Text style={styles.removePhoto}>Remover foto</Text>
-          </Pressable>
+          </FeedbackPressable>
         )}
       </View>
 
@@ -138,14 +157,20 @@ export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
       {profileFields.map(([field, label]) => (
         <View key={field}>
           <Text style={styles.label}>{label}</Text>
-          <TextInput style={styles.input} value={draft[field] || ''} onChangeText={(value) => updateField(field, value)} />
+          <TextInput
+            style={styles.input}
+            value={draft[field] || ''}
+            onChangeText={(value) => updateField(field, ['matricula', 'siape'].includes(field) ? value.replace(/\D/g, '').slice(0, 7) : value)}
+            keyboardType={['matricula', 'siape'].includes(field) ? 'number-pad' : 'default'}
+            maxLength={['matricula', 'siape'].includes(field) ? 7 : undefined}
+          />
         </View>
       ))}
 
       {!!status && <Text style={styles.status}>{status}</Text>}
-      <Pressable style={styles.button} onPress={saveProfile} disabled={loading}>
+      <FeedbackPressable style={styles.button} onPress={saveProfile} disabled={loading}>
         {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>Salvar alterações</Text>}
-      </Pressable>
+      </FeedbackPressable>
     </View>
   );
 }
