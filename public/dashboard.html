@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | SODA</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="dashboard-wrap">
+        <div class="dashboard-card">
+          <div class="dashboard-header">
+            <h2 id="welcomeMessage">Bem-vindo</h2>
+            <button class="logout-btn" id="logoutBtn">Sair</button>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-item">
+              <strong>Usuário</strong>
+              <span id="userName">Carregando...</span>
+            </div>
+            <div class="dashboard-item">
+              <strong>E-mail</strong>
+              <span id="userEmail">Carregando...</span>
+            </div>
+            <div class="dashboard-item">
+              <strong>Tipo</strong>
+              <span id="userType">Carregando...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const user = JSON.parse(localStorage.getItem('sodaUser') || '{}');
+      const token = localStorage.getItem('sodaToken');
+
+      if (!token || !user.idUsuario) {
+        window.location.href = '/login';
+      }
+
+      document.getElementById('welcomeMessage').textContent = `Bem-vindo, ${user.nome || 'usuário'}`;
+      document.getElementById('userName').textContent = user.nome || '-';
+      document.getElementById('userEmail').textContent = user.email || '-';
+      document.getElementById('userType').textContent = user.tipoUsuario || '-';
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('sodaToken');
+        localStorage.removeItem('sodaUser');
+        window.location.href = '/login';
+      });
+    </script>
+  </body>
+</html>
