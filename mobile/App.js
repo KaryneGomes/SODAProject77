@@ -53,6 +53,7 @@ export default function App() {
   const [token, setToken] = useState('');
   const [user, setUser] = useState(null);
   const [manifestacoes, setManifestacoes] = useState([]);
+  const [feedVisible, setFeedVisible] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
@@ -181,6 +182,8 @@ export default function App() {
       if (loginMode) {
         setToken(data.token);
         setUser(data.usuario);
+        setFeedVisible(false);
+        setComposerOpen(false);
         setScreen('dashboard');
       } else {
         setLoginMode(true);
@@ -236,6 +239,7 @@ export default function App() {
       setDescricao('');
       setImagem(null);
       setComposerOpen(false);
+      setFeedVisible(true);
       setStatus('Manifestação criada com sucesso.');
       await loadManifestacoes();
     } catch (error) {
@@ -308,6 +312,8 @@ export default function App() {
     setToken('');
     setUser(null);
     setManifestacoes([]);
+    setFeedVisible(false);
+    setComposerOpen(false);
     setScreen('home');
   }
 
@@ -399,11 +405,52 @@ export default function App() {
   }
 
   function renderDashboard() {
+    if (!feedVisible) {
+      const quantidade = manifestacoes.length;
+      return (
+        <>
+          <View style={styles.dashboard}>
+            <View style={styles.infoGrid}>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Perfil</Text>
+                <Text style={styles.infoValue}>{user?.tipoUsuario || '-'}</Text>
+              </View>
+            </View>
+            <View style={styles.dashboardDivider} />
+            <Text style={styles.sectionTitle}>Resumo</Text>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryTitle}>
+                Você tem {quantidade} {quantidade === 1 ? 'manifestação' : 'manifestações'} no sistema.
+              </Text>
+              <Text style={styles.summaryText}>Acesse o feed para visualizar e responder às manifestações recebidas.</Text>
+            </View>
+            <View style={styles.dashboardDivider} />
+            <Text style={styles.sectionTitle}>Ações</Text>
+            <FeedbackPressable style={styles.button} onPress={() => { setFeedVisible(true); setComposerOpen(false); setStatus(''); }}>
+              <Text style={styles.buttonText}>Ir para manifestações</Text>
+            </FeedbackPressable>
+          </View>
+          <FeedbackPressable
+            style={[styles.button, styles.writeButtonExternal]}
+            onPress={() => { setFeedVisible(true); setComposerOpen(true); setStatus(''); }}
+          >
+            <Text style={styles.buttonText}>Escrever</Text>
+          </FeedbackPressable>
+        </>
+      );
+    }
+
     return (
       <>
-        <View style={styles.infoGrid}>
-          <View style={styles.infoItem}><Text style={styles.infoLabel}>E-mail</Text><Text style={styles.infoValue}>{user?.email || '-'}</Text></View>
-          <View style={styles.infoItem}><Text style={styles.infoLabel}>Perfil</Text><Text style={styles.infoValue}>{user?.tipoUsuario || '-'}</Text></View>
+        <View style={styles.feedHeading}>
+          <FeedbackPressable style={styles.back} onPress={() => { setFeedVisible(false); setComposerOpen(false); setStatus(''); }}>
+            <Text style={styles.backText}>← Voltar ao resumo</Text>
+          </FeedbackPressable>
+          {!composerOpen && (
+            <FeedbackPressable style={styles.feedWriteButton} onPress={() => { setComposerOpen(true); setStatus(''); }}>
+              <Text style={styles.outlineText}>Escrever</Text>
+            </FeedbackPressable>
+          )}
         </View>
         {!!status && <Text style={styles.status}>{status}</Text>}
         {composerOpen ? (
@@ -633,6 +680,13 @@ const styles = StyleSheet.create({
   infoLabel: { color: '#59d4b1', fontWeight: 'bold', marginBottom: 4 },
   infoValue: { color: '#eaf3f8' },
   section: { borderTopColor: 'rgba(255,255,255,0.12)', borderTopWidth: 1, paddingTop: 18, marginBottom: 22 },
+  dashboardDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.14)', marginVertical: 18 },
+  summaryCard: { backgroundColor: '#315267', borderRadius: 12, padding: 16, marginTop: 8 },
+  summaryTitle: { color: '#eaf3f8', fontSize: 18, lineHeight: 24, fontWeight: 'bold' },
+  summaryText: { color: '#b9c9d7', fontSize: 15, lineHeight: 22, marginTop: 10 },
+  feedHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+  feedWriteButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 9, paddingVertical: 8, paddingHorizontal: 12 },
+  writeButtonExternal: { alignSelf: 'flex-end', minWidth: 144, marginTop: 16, marginBottom: 8 },
   composerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   cancelButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 8, paddingVertical: 7, paddingHorizontal: 10 },
   writeButton: { marginBottom: 22 },
