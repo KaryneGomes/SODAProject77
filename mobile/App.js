@@ -407,31 +407,31 @@ export default function App() {
   function renderDashboard() {
     if (composerOpen) {
       return (
-        <View style={styles.dashboard}>
-          <View style={styles.composerHeader}>
+        <>
+          <FeedbackPressable style={styles.composerBack} onPress={() => { setComposerOpen(false); setStatus(''); }}>
+            <Text style={styles.backText}>← Voltar</Text>
+          </FeedbackPressable>
+          <View style={styles.dashboard}>
             <Text style={styles.sectionTitle}>Escrever manifestação</Text>
-            <FeedbackPressable style={styles.cancelButton} onPress={() => { setComposerOpen(false); setStatus(''); }}>
-              <Text style={styles.outlineText}>Voltar</Text>
+            {!!status && <Text style={styles.status}>{status}</Text>}
+            <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título da manifestação" placeholderTextColor="#9aaab5" />
+            <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
+            <FeedbackPressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
+              <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
+            </FeedbackPressable>
+            {imagem && (
+              <View>
+                <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
+                <FeedbackPressable onPress={() => setImagem(null)}>
+                  <Text style={styles.removeImage}>Remover imagem</Text>
+                </FeedbackPressable>
+              </View>
+            )}
+            <FeedbackPressable style={styles.button} onPress={createManifestacao} disabled={loading}>
+              {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>Publicar manifestação</Text>}
             </FeedbackPressable>
           </View>
-          {!!status && <Text style={styles.status}>{status}</Text>}
-          <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título da manifestação" placeholderTextColor="#9aaab5" />
-          <TextInput style={[styles.input, styles.textarea]} value={descricao} onChangeText={setDescricao} placeholder="Descreva sua manifestação" placeholderTextColor="#9aaab5" multiline />
-          <FeedbackPressable style={styles.imageButton} onPress={pickManifestacaoImage} disabled={loading}>
-            <Text style={styles.outlineText}>{imagem ? 'Trocar imagem' : 'Anexar imagem (opcional)'}</Text>
-          </FeedbackPressable>
-          {imagem && (
-            <View>
-              <Image source={{ uri: imagem }} style={styles.imagePreview} resizeMode="cover" />
-              <FeedbackPressable onPress={() => setImagem(null)}>
-                <Text style={styles.removeImage}>Remover imagem</Text>
-              </FeedbackPressable>
-            </View>
-          )}
-          <FeedbackPressable style={styles.button} onPress={createManifestacao} disabled={loading}>
-            {loading ? <ActivityIndicator color="#112b3a" /> : <Text style={styles.buttonText}>Publicar manifestação</Text>}
-          </FeedbackPressable>
-        </View>
+        </>
       );
     }
 
@@ -684,6 +684,7 @@ const styles = StyleSheet.create({
   summaryText: { color: '#b9c9d7', fontSize: 15, lineHeight: 22, marginTop: 10 },
   feedHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   feedWriteButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 9, paddingVertical: 8, paddingHorizontal: 12 },
+  composerBack: { alignSelf: 'flex-start', marginBottom: 12 },
   writeButtonExternal: { alignSelf: 'flex-end', minWidth: 144, marginTop: 16, marginBottom: 8 },
   composerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   cancelButton: { borderColor: '#59d4b1', borderWidth: 1, borderRadius: 8, paddingVertical: 7, paddingHorizontal: 10 },
