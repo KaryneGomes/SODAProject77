@@ -24,6 +24,10 @@ const EMAIL_IFPE_REGEX = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)*ifpe\.edu\.br$/
 const SENHA_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const MATRICULA_REGEX = /^\d{7,12}$/;
 const SIAPE_REGEX = /^\d{6,10}$/;
+const normalizeSearchValue = (value) => String(value || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase();
 
 function validarEmailIFPE(email) {
   return EMAIL_IFPE_REGEX.test(String(email || '').trim());
@@ -99,10 +103,18 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (screen === 'dashboard' && token) {
+    if (screen === 'manifestacoes' && token) {
       loadManifestacoes();
     }
   }, [screen, token]);
+
+  useEffect(() => {
+    if (!token || !user?.idUsuario || Object.prototype.hasOwnProperty.call(user, 'fotoPerfil')) return;
+
+    request(`/usuarios/${user.idUsuario}`)
+      .then(setUser)
+      .catch((error) => setStatus(error.message));
+  }, [token, user?.idUsuario, user?.fotoPerfil]);
 
   async function request(path, options = {}) {
     if (!API_BASE_URL) {
@@ -195,7 +207,8 @@ export default function App() {
       if (loginMode) {
         setToken(data.token);
         setUser(data.usuario);
-        setScreen('dashboard');
+        setManifestacaoBusca('');
+        setScreen('manifestacoes');
       } else {
         setLoginMode(true);
         setSenha('');
@@ -249,9 +262,10 @@ export default function App() {
       setTitulo('');
       setDescricao('');
       setImagem(null);
+      setManifestacaoBusca('');
       showProfileToast('Manifestação enviada com sucesso.');
       setStatus('');
-      loadManifestacoes();
+      setScreen('manifestacoes');
     } catch (error) {
       setStatus(error.message);
     } finally {
@@ -323,6 +337,7 @@ export default function App() {
     setToken('');
     setUser(null);
     setManifestacoes([]);
+    setManifestacaoBusca('');
     setScreen('home');
   }
 
@@ -446,45 +461,10 @@ export default function App() {
     );
   }
 
-  function renderDashboard() {
-    return (
-      <>
-        <View style={styles.profileTopCard}>
-          <Text style={styles.infoLabel}>Perfil</Text>
-          <Text style={styles.infoValue}>{user?.tipoUsuario || '-'}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Resumo</Text>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryTitle}>Você tem {manifestacoes.length} manifestação{manifestacoes.length === 1 ? '' : 'ões'} no sistema.</Text>
-            <Text style={styles.summaryText}>Acesse o feed para visualizar, buscar e responder aos registros recebidos.</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ações</Text>
-          <Pressable
-            style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-            onPress={() => setScreen('manifestacoes')}
-          >
-            <Text style={styles.buttonText}>Ir para manifestações</Text>
-          </Pressable>
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [styles.fab, pressed && styles.buttonPressed]}
-          onPress={() => setScreen('nova-manifestacao')}
-        >
-          <Text style={styles.fabText}>Escrever</Text>
-        </Pressable>
-      </>
-    );
-  }
-
   function renderNovaManifestacao() {
     return (
       <>
+        {!!status && <Text style={styles.status}>{status}</Text>}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Nova manifestação</Text>
           <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título" placeholderTextColor="#9aaab5" />
@@ -513,9 +493,9 @@ export default function App() {
           </Pressable>
           <Pressable
             style={({ pressed }) => [styles.outlineButton, pressed && styles.buttonPressed]}
-            onPress={() => setScreen('dashboard')}
+            onPress={() => setScreen('manifestacoes')}
           >
-            <Text style={styles.outlineText}>Voltar ao resumo</Text>
+            <Text style={styles.outlineText}>Voltar às manifestações</Text>
           </Pressable>
         </View>
       </>
@@ -524,15 +504,16 @@ export default function App() {
 
   function renderManifestacoes() {
     const listaFiltrada = manifestacoes.filter((item) => {
-      const termo = manifestacaoBusca.trim().toLowerCase();
+      const termo = normalizeSearchValue(manifestacaoBusca.trim());
       if (!termo) return true;
       const autor = item.Usuario || item.usuario || {};
-      const nomeAutor = (autor.nome || '').toLowerCase();
-      return [item.titulo, item.descricao, nomeAutor].some((valor) => String(valor || '').toLowerCase().includes(termo));
+      return [item.titulo, item.descricao, autor.nome, item.status]
+        .some((valor) => normalizeSearchValue(valor).includes(termo));
     });
 
     return (
       <>
+        {!!status && <Text style={styles.status}>{status}</Text>}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Manifestações</Text>
           <TextInput
@@ -542,15 +523,9 @@ export default function App() {
             placeholder="Pesquisar manifestações"
             placeholderTextColor="#9aaab5"
           />
-          <Pressable
-            style={({ pressed }) => [styles.outlineButton, pressed && styles.buttonPressed]}
-            onPress={() => setScreen('dashboard')}
-          >
-            <Text style={styles.outlineText}>Voltar ao resumo</Text>
-          </Pressable>
         </View>
 
-        {listaFiltrada.length === 0 ? <Text style={styles.empty}>Nenhuma manifestação encontrada.</Text> : listaFiltrada.map((item) => {
+        {listaFiltrada.length === 0 ? <Text style={styles.empty}>{manifestacoes.length && manifestacaoBusca.trim() ? 'Nenhuma manifestação corresponde à busca.' : 'Nenhuma manifestação encontrada.'}</Text> : listaFiltrada.map((item) => {
           const autor = item.Usuario || item.usuario || {};
           const autorNome = autor.nome || 'Usuário';
           const iniciais = autorNome.trim().charAt(0).toUpperCase();
@@ -652,13 +627,13 @@ export default function App() {
     );
   }
 
-  const canShowBackArrow = !!user && ['dashboard', 'home', 'auth'].includes(screen) === false;
+  const canShowBackArrow = !!user && screen === 'nova-manifestacao';
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
       <View style={styles.appHeader}>
-        <Pressable onPress={() => setScreen(user ? 'dashboard' : 'home')} style={styles.appBrand}>
+        <Pressable onPress={() => setScreen(user ? 'manifestacoes' : 'home')} style={styles.appBrand}>
           <Text style={styles.appLogo}>SODA</Text>
           <Text style={styles.appTagline}>Ouvidoria digital acadêmica</Text>
         </Pressable>
@@ -667,27 +642,42 @@ export default function App() {
           {user && (
             <Pressable
               style={({ pressed }) => [styles.appHeaderButton, pressed && styles.buttonPressed]}
-              onPress={screen === 'profile' ? () => setScreen('dashboard') : openProfile}
-            >
-              <Text style={styles.appHeaderButtonText}>{screen === 'profile' ? 'Início' : 'Perfil'}</Text>
-            </Pressable>
-          )}
-          {user && (
-            <Pressable
-              style={({ pressed }) => [styles.appHeaderButton, pressed && styles.buttonPressed]}
               onPress={logout}
             >
               <Text style={styles.appHeaderButtonText}>Sair</Text>
             </Pressable>
           )}
+          {user && (
+            <Pressable
+              style={({ pressed }) => [styles.appHeaderButton, pressed && styles.buttonPressed]}
+              onPress={screen === 'profile' ? () => setScreen('manifestacoes') : openProfile}
+              accessibilityRole="button"
+              accessibilityLabel={screen === 'profile' ? 'Voltar às manifestações' : 'Abrir perfil'}
+            >
+              <View style={styles.profileIcon}>
+                {user.fotoPerfil ? (
+                  <Image source={{ uri: user.fotoPerfil }} style={styles.profileIconImage} />
+                ) : (
+                  <>
+                    <View style={styles.profileIconHead} />
+                    <View style={styles.profileIconBody} />
+                  </>
+                )}
+              </View>
+            </Pressable>
+          )}
         </View>
       </View>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[styles.content, ['manifestacoes', 'nova-manifestacao'].includes(screen) && styles.feedContent]}
+        keyboardShouldPersistTaps="handled"
+      >
         {canShowBackArrow && (
           <Pressable
             style={({ pressed }) => [styles.backNavButton, pressed && styles.buttonPressed]}
-            onPress={() => setScreen('dashboard')}
-            accessibilityLabel="Voltar para o resumo"
+            onPress={() => setScreen('manifestacoes')}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar para as manifestações"
           >
             <Text style={styles.backNavText}>←</Text>
           </Pressable>
@@ -702,18 +692,28 @@ export default function App() {
           </View>
         )}
         {screen === 'auth' && <View style={styles.card}>{renderAuth()}</View>}
-        {screen === 'dashboard' && <View style={styles.dashboard}>{renderDashboard()}</View>}
         {screen === 'nova-manifestacao' && <View style={styles.dashboard}>{renderNovaManifestacao()}</View>}
         {screen === 'manifestacoes' && <View style={styles.dashboard}>{renderManifestacoes()}</View>}
         {screen === 'profile' && (
           <Perfil
             user={user}
             request={request}
+            onBack={() => setScreen('manifestacoes')}
             onSaved={(updatedUser) => setUser((current) => ({ ...current, ...updatedUser }))}
             onPhotoSaved={(message) => showProfileToast(message)}
           />
         )}
       </ScrollView>
+      {screen === 'manifestacoes' && (
+        <Pressable
+          style={({ pressed }) => [styles.fab, pressed && styles.buttonPressed]}
+          onPress={() => setScreen('nova-manifestacao')}
+          accessibilityRole="button"
+          accessibilityLabel="Criar manifestação"
+        >
+          <Text style={styles.fabText}>+</Text>
+        </Pressable>
+      )}
       {!!profileToast && (
         <View style={styles.toast} accessibilityRole="alert">
           <Text style={styles.toastText}>{profileToast}</Text>
@@ -729,7 +729,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#112b3a' },
   content: { flexGrow: 1, justifyContent: 'center', padding: 22, paddingTop: 18 },
-  appHeader: { minHeight: 108, paddingHorizontal: 24, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0d2532', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', zIndex: 2 },
+  appHeader: { minHeight: 124, paddingHorizontal: 24, paddingTop: 40, paddingBottom: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#0d2532', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', zIndex: 2 },
+  feedContent: { justifyContent: 'flex-start', paddingBottom: 108 },
   backNavButton: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: '#59d4b1', elevation: 6, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, zIndex: 3, marginBottom: 85, alignSelf: 'flex-start' },
   backNavText: { color: '#112b3a', fontSize: 28, fontWeight: '700', lineHeight: 28 },
   appBrand: { flexShrink: 1 },
@@ -739,7 +740,11 @@ const styles = StyleSheet.create({
   appHeaderUser: { color: '#dceaf3', fontSize: 15, maxWidth: 116 },
   appHeaderButton: { paddingVertical: 11, paddingHorizontal: 10 },
   appHeaderButtonText: { color: '#59d4b1', fontWeight: 'bold', fontSize: 16 },
-  toast: { position: 'absolute', top: 116, left: 18, right: 18, zIndex: 5, elevation: 5, backgroundColor: '#59d4b1', borderRadius: 12, paddingVertical: 13, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  profileIcon: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: '#59d4b1', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  profileIconImage: { width: '100%', height: '100%' },
+  profileIconHead: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#59d4b1' },
+  profileIconBody: { width: 17, height: 9, marginTop: 3, borderTopLeftRadius: 9, borderTopRightRadius: 9, backgroundColor: '#59d4b1' },
+  toast: { position: 'absolute', top: 132, left: 18, right: 18, zIndex: 5, elevation: 5, backgroundColor: '#59d4b1', borderRadius: 12, paddingVertical: 13, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
   toastText: { color: '#112b3a', fontWeight: 'bold', flex: 1, marginRight: 12 },
   toastClose: { color: '#112b3a', fontSize: 24, lineHeight: 25, fontWeight: 'bold' },
   home: { justifyContent: 'flex-start', alignItems: 'center', flex: 1, paddingTop: 8 },
@@ -775,21 +780,11 @@ const styles = StyleSheet.create({
   switch: { color: '#59d4b1', textAlign: 'center', marginTop: 18 },
   back: { marginBottom: 4 },
   backText: { color: '#b9c9d7', fontSize: 15 },
-  infoGrid: { gap: 10, marginBottom: 22 },
-  profileTopCard: { backgroundColor: '#315267', borderRadius: 12, padding: 14, marginTop: 0, marginBottom: 18 },
-  infoItem: { backgroundColor: '#315267', borderRadius: 10, padding: 14 },
-  infoLabel: { color: '#59d4b1', fontWeight: 'bold', marginBottom: 4 },
-  infoValue: { color: '#eaf3f8' },
   section: { borderTopColor: 'rgba(255,255,255,0.12)', borderTopWidth: 1, paddingTop: 18, marginBottom: 22 },
   sectionTitle: { color: '#eaf3f8', fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  feedHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  feedCounter: { color: '#59d4b1', fontSize: 12, fontWeight: '700' },
-  summaryCard: { backgroundColor: '#315267', borderRadius: 12, padding: 16, marginBottom: 12 },
-  summaryTitle: { color: '#eaf3f8', fontSize: 18, fontWeight: '700', marginBottom: 6 },
-  summaryText: { color: '#b9c9d7', lineHeight: 20 },
   searchInput: { backgroundColor: '#4a555f', borderRadius: 10, padding: 14, color: 'white', minHeight: 50, fontSize: 16, marginBottom: 12 },
-  fab: { position: 'absolute', right: 18, bottom: -71, backgroundColor: '#59d4b1', borderRadius: 16, paddingVertical: 14, paddingHorizontal: 22, elevation: 6, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 4 } },
-  fabText: { color: '#112b3a', fontWeight: 'bold', fontSize: 16 },
+  fab: { position: 'absolute', right: 24, bottom: 82, width: 60, height: 60, borderRadius: 30, backgroundColor: '#59d4b1', alignItems: 'center', justifyContent: 'center', zIndex: 4, elevation: 8, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 8, shadowOffset: { width: 0, height: 4 } },
+  fabText: { color: '#112b3a', fontSize: 38, fontWeight: '400', lineHeight: 44, marginTop: -3 },
   empty: { color: '#b9c9d7', marginBottom: 10 },
   manifestacao: { backgroundColor: '#315267', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(89, 212, 177, 0.18)' },
   manifestacaoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },

@@ -32,7 +32,7 @@ const fieldsByProfile = {
   ],
 };
 
-export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
+export default function Perfil({ user, request, onBack, onSaved, onPhotoSaved }) {
   const [draft, setDraft] = useState(user || {});
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -109,6 +109,14 @@ export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
 
   return (
     <View style={styles.card}>
+      <Pressable
+        style={styles.back}
+        onPress={onBack}
+        accessibilityRole="button"
+        accessibilityLabel="Voltar ao início"
+      >
+        <Text style={styles.backText}>← Voltar ao início</Text>
+      </Pressable>
       <Text style={styles.title}>Meu perfil</Text>
       <Text style={styles.subtitle}>Dados de {profileLabel(user?.tipoUsuario || 'aluno')}</Text>
 
@@ -152,6 +160,7 @@ export default function Perfil({ user, request, onSaved, onPhotoSaved }) {
 
 const styles = StyleSheet.create({
   card: { backgroundColor: '#1b4053', padding: 22, borderRadius: 20 },
+  back: { alignSelf: 'flex-start', marginBottom: 8 },
   backText: { color: '#b9c9d7', fontSize: 15 },
   title: { color: 'white', fontSize: 27, fontWeight: 'bold', marginTop: 18 },
   subtitle: { color: '#b9c9d7', fontSize: 15, marginTop: 8, marginBottom: 14 },
